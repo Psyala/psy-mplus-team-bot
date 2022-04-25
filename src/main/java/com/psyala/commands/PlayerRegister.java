@@ -8,19 +8,19 @@ import com.psyala.util.MessageFormatting;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class RegisterPlayer extends ParameterCommand {
-    public RegisterPlayer() {
-        super("register", "Register player to the team\r\n\r\n\tUsage:\r\n\t\tregister <PlayerName>");
+public class PlayerRegister extends ParameterCommand {
+    public PlayerRegister() {
+        super("register", "Register player to the team\r\n\r\n\tUsage: register <PlayerName>");
     }
 
     @Override
-    public void handle(Guild guild, MessageChannel channel, List<String> parameters) {
+    public void handle(Guild guild, User author, MessageChannel channel, List<String> parameters) {
         String responseMessage = "";
-        lastMessageCausedOverviewRefresh = false;
 
         if (parameters.isEmpty()) {
             responseMessage = "No player name specified.";
@@ -29,7 +29,7 @@ public class RegisterPlayer extends ParameterCommand {
             if (playerName.trim().isEmpty()) {
                 responseMessage = "No player name specified";
             } else {
-                Server server = PsyBot.guildServerMap.getOrDefault(guild, new Server());
+                Server server = PsyBot.guildController.getGuildStorageObject(guild, new Server());
                 server.guildId = guild.getIdLong();
 
                 if (server.playerList.stream().anyMatch(player -> player.name.equalsIgnoreCase(playerName))) {
@@ -38,18 +38,17 @@ public class RegisterPlayer extends ParameterCommand {
                     Player newPlayer = new Player();
                     newPlayer.name = playerName;
                     server.playerList.add(newPlayer);
-                    PsyBot.guildServerMap.put(guild, server);
-                    PsyBot.guildOverviewUpdated(guild);
-                    lastMessageCausedOverviewRefresh = true;
+                    PsyBot.guildController.saveGuildStorageObject(guild, server);
+                    PsyBot.guildController.guildOverviewUpdated(guild);
                 }
             }
         }
 
         if (!responseMessage.isEmpty())
             channel.sendMessageEmbeds(
-                            MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
-                    )
-                    .delay(20, TimeUnit.SECONDS)
+                    MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
+            )
+                    .delay(PsyBot.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
                     .queue();
     }

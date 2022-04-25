@@ -2,13 +2,10 @@
 
 # TODO:
 
-* Implement pojos for classes and their armour classes
-* Implement pojos for Dungeons (shortname & full name)
-* Implement setting up a user character
 * Implement adding a character key
-* Implement sending current-keys overview on change and on startup
-* Implement persisting of data
+* Add class icons to discord & keystone icon
 * Implement boost query
 * Implement auto resetting saved keys on reset day
 * Implement build job
+* Create WoW WA/Addon that creates output to put directly in chat
 * Set up hosting

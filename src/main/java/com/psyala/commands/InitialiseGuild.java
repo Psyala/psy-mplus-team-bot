@@ -6,6 +6,7 @@ import com.psyala.util.MessageFormatting;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,21 +16,20 @@ public class InitialiseGuild extends SimpleCommand {
     }
 
     @Override
-    public void handle(Guild guild, MessageChannel channel) {
-        if (PsyBot.validGuilds.contains(guild)) {
+    public void handle(Guild guild, User author, MessageChannel channel) {
+        if (PsyBot.guildController.getValidGuilds().contains(guild)) {
             channel.sendMessageEmbeds(
-                            MessageFormatting.createTextualEmbedMessage("Initialisation Result", "Server already initialised")
-                    )
-                    .delay(20, TimeUnit.SECONDS)
+                    MessageFormatting.createTextualEmbedMessage("Initialisation Result", "Server already initialised")
+            )
+                    .delay(PsyBot.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
                     .queue();
         } else {
-            boolean initialised = PsyBot.initialiseGuild(guild);
+            boolean initialised = PsyBot.guildController.initialiseGuild(guild);
             if (initialised) {
                 channel.sendMessageEmbeds(
-                                MessageFormatting.createTextualEmbedMessage("Initialisation Result", "Server now initialised")
-                        )
-                        .queue();
+                        MessageFormatting.createTextualEmbedMessage("Initialisation Result", "Server now initialised")
+                ).queue();
             }
         }
     }

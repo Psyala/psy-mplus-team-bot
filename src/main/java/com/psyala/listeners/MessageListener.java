@@ -1,10 +1,7 @@
 package com.psyala.listeners;
 
 import com.psyala.PsyBot;
-import com.psyala.commands.DelistPlayer;
-import com.psyala.commands.HelpCommand;
-import com.psyala.commands.InitialiseGuild;
-import com.psyala.commands.RegisterPlayer;
+import com.psyala.commands.*;
 import com.psyala.commands.base.Command;
 import com.psyala.commands.base.ParameterCommand;
 import com.psyala.commands.base.SimpleCommand;
@@ -28,8 +25,10 @@ public class MessageListener extends ListenerAdapter {
     public MessageListener() {
         commandList.add(new HelpCommand(commandList));
         commandList.add(new InitialiseGuild());
-        commandList.add(new RegisterPlayer());
-        commandList.add(new DelistPlayer());
+        commandList.add(new PlayerRegister());
+        commandList.add(new PlayerDelist());
+        commandList.add(new CharacterRegister());
+        commandList.add(new CharacterDelist());
     }
 
     @Override
@@ -55,33 +54,33 @@ public class MessageListener extends ListenerAdapter {
             }
 
             //Handle command
-            AtomicBoolean messageDeleted = new AtomicBoolean(false);
-            commandList.forEach(command -> {
-                boolean actioned = false;
-                if (msg.equals("!" + command.getCommand()) && command instanceof SimpleCommand) {
-                    ((SimpleCommand) command).handle(guild, channel);
-                    messageDeleted.set(true);
-                    if (!command.didLastMessageCausedOverviewRefresh()) {
-                        message.delete().queue();
+            List<String> messages = Arrays.asList(msg.split("\n"));
+            boolean batch = messages.size() > 1;
+            messages.forEach(splitMessage -> {
+                AtomicBoolean messageDeleted = new AtomicBoolean(false);
+                commandList.forEach(command -> {
+                    if (splitMessage.equals("!" + command.getCommand()) && command instanceof SimpleCommand) {
+                        ((SimpleCommand) command).handle(guild, author, channel);
+                        messageDeleted.set(true);
+                        if (!batch) message.delete().queue();
+                        LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
                     }
-                    LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
-                }
-                if (msg.startsWith("!" + command.getCommand()) && command instanceof ParameterCommand) {
-                    List<String> parameters = List.of(msg.replace("!" + command.getCommand(), "").split(" "));
-                    ((ParameterCommand) command).handle(guild, channel, parameters.stream().filter(s -> !s.isEmpty()).collect(Collectors.toList()));
-                    messageDeleted.set(true);
-                    if (!command.didLastMessageCausedOverviewRefresh()) {
-                        message.delete().queue();
+                    if (splitMessage.startsWith("!" + command.getCommand()) && command instanceof ParameterCommand) {
+                        List<String> parameters = List.of(splitMessage.replace("!" + command.getCommand(), "").split(" "));
+                        ((ParameterCommand) command).handle(guild, author, channel, parameters.stream().filter(s -> !s.isEmpty()).collect(Collectors.toList()));
+                        messageDeleted.set(true);
+                        if (!batch) message.delete().queue();
+                        LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
                     }
-                    LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
+                });
+                if (batch) message.delete().queue();
+
+                //Delete incoming message if in moderated channel
+                if (Arrays.asList(PsyBot.configuration.channelOverviewName)
+                        .contains(textChannel.getName()) && !messageDeleted.get()) {
+                    message.delete().queue();
                 }
             });
-
-            //Delete incoming message if in moderated channel
-            if (Arrays.asList(PsyBot.configuration.channelOverviewName)
-                    .contains(textChannel.getName()) && !messageDeleted.get()) {
-                message.delete().queue();
-            }
         }
     }
 }

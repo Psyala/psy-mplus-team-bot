@@ -1,12 +1,17 @@
 package com.psyala.commands;
 
+import com.psyala.PsyBot;
 import com.psyala.commands.base.Command;
 import com.psyala.commands.base.SimpleCommand;
+import com.psyala.pojo.Dungeon;
+import com.psyala.pojo.characterists.CharacterClass;
 import com.psyala.util.MessageFormatting;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -20,14 +25,37 @@ public class HelpCommand extends SimpleCommand {
     }
 
     @Override
-    public void handle(Guild guild, MessageChannel channel) {
-        String helpMessage = commandList.stream().map(command ->
+    public void handle(Guild guild, User author, MessageChannel channel) {
+        String commands = "**Commands**" +
+                "\r\n```" +
+                commandList.stream().map(command ->
                         "• " + command.getCommand() + ": " + command.getDescription())
-                .collect(Collectors.joining("\r\n"));
+                        .collect(Collectors.joining("\r\n\r\n")) +
+                "```";
 
-        channel.sendMessageEmbeds(MessageFormatting.createTextualEmbedMessage("List of Commands", helpMessage))
-                .delay(20, TimeUnit.SECONDS)
-                .flatMap(Message::delete)
-                .queue();
+        String lookups = "**Lookups**" +
+                "\r\n```" +
+                "**Dungeons**\r\n• " +
+                Arrays.stream(Dungeon.values()).map(Dungeon::getAcronym).collect(Collectors.joining("\r\n• ")) +
+                "\r\n```\r\n```" +
+                "**Classes**\r\n• " +
+                Arrays.stream(CharacterClass.values()).map(Enum::name).collect(Collectors.joining("\r\n• ")) +
+                "\r\n```";
+
+        String helpMessage = commands.concat("\r\n\r\n").concat(lookups);
+        author.openPrivateChannel()
+                .flatMap(privateChannel -> privateChannel.sendMessageEmbeds(MessageFormatting.createTextualEmbedMessage(":robot: Bot Help :robot:", helpMessage)))
+                .queue(success -> {
+                }, failure -> {
+                    channel.sendMessageEmbeds(
+                            MessageFormatting.createTextualEmbedMessage(
+                                    ":robot: Bot Help :robot:",
+                                    "Could not whisper you ".concat(author.getAsMention()) + " check your privacy settings!"
+                            )
+                    )
+                            .delay(PsyBot.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
+                            .flatMap(Message::delete)
+                            .queue();
+                });
     }
 }
