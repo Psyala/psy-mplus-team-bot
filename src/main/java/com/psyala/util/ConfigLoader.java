@@ -17,8 +17,6 @@ public class ConfigLoader {
     private static final String cfg_resetDay = "cfg.resetDay";
     private static final String cfg_resetHourUtc = "cfg.resetHourUtc";
     private static final String cfg_channelOverview = "cfg.channelOverview";
-    private static final String cfg_channelQuery = "cfg.channelQuery";
-    private static final String data_characters = "data_characters";
 
     public Optional<Configuration> loadConfiguration() {
         try (FileInputStream stream = new FileInputStream(getClass().getResource(file).getPath())) {
@@ -29,8 +27,7 @@ public class ConfigLoader {
                     properties.getProperty(cfg_botToken, ""),
                     properties.getProperty(cfg_resetDay, "Wednesday"),
                     Integer.parseInt(properties.getProperty(cfg_resetHourUtc, "7")),
-                    properties.getProperty(cfg_channelOverview, "current-keys"),
-                    properties.getProperty(cfg_channelQuery, "boost-query")
+                    properties.getProperty(cfg_channelOverview, "current-keys")
             ));
         } catch (Exception ex) {
             LOGGER.error("Error loading configuration file", ex);
@@ -44,8 +41,7 @@ public class ConfigLoader {
             properties.setProperty(cfg_botToken, configuration.botToken);
             properties.setProperty(cfg_resetDay, configuration.resetDay);
             properties.setProperty(cfg_resetHourUtc, String.valueOf(configuration.resetHourUtc));
-            properties.setProperty(cfg_channelOverview, configuration.channelOverview);
-            properties.setProperty(cfg_channelQuery, configuration.channelQuery);
+            properties.setProperty(cfg_channelOverview, configuration.channelOverviewName);
 
             properties.store(stream, "Comments");
         } catch (Exception ex) {

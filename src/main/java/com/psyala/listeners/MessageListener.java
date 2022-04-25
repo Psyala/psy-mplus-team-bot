@@ -1,9 +1,13 @@
 package com.psyala.listeners;
 
-import com.psyala.PsyMPlusBot;
-import com.psyala.commands.Command;
+import com.psyala.PsyBot;
+import com.psyala.commands.DelistPlayer;
 import com.psyala.commands.HelpCommand;
-import net.dv8tion.jda.api.JDA;
+import com.psyala.commands.InitialiseGuild;
+import com.psyala.commands.RegisterPlayer;
+import com.psyala.commands.base.Command;
+import com.psyala.commands.base.ParameterCommand;
+import com.psyala.commands.base.SimpleCommand;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -15,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class MessageListener extends ListenerAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageListener.class);
@@ -22,12 +27,13 @@ public class MessageListener extends ListenerAdapter {
 
     public MessageListener() {
         commandList.add(new HelpCommand(commandList));
+        commandList.add(new InitialiseGuild());
+        commandList.add(new RegisterPlayer());
+        commandList.add(new DelistPlayer());
     }
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        JDA discordBot = event.getJDA();
-
         //Event specific information
         User author = event.getAuthor();
         Message message = event.getMessage();
@@ -47,24 +53,35 @@ public class MessageListener extends ListenerAdapter {
             } else {
                 name = member.getEffectiveName();
             }
-            LOGGER.info(String.format("(%s)[%s]<%s>: %s\n", guild.getName(), textChannel.getName(), name, msg));
 
             //Handle command
             AtomicBoolean messageDeleted = new AtomicBoolean(false);
             commandList.forEach(command -> {
-                if (msg.equals("!" + command.getCommand())) {
-                    command.handle(channel);
-                    message.delete().queue();
+                boolean actioned = false;
+                if (msg.equals("!" + command.getCommand()) && command instanceof SimpleCommand) {
+                    ((SimpleCommand) command).handle(guild, channel);
                     messageDeleted.set(true);
+                    if (!command.didLastMessageCausedOverviewRefresh()) {
+                        message.delete().queue();
+                    }
+                    LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
+                }
+                if (msg.startsWith("!" + command.getCommand()) && command instanceof ParameterCommand) {
+                    List<String> parameters = List.of(msg.replace("!" + command.getCommand(), "").split(" "));
+                    ((ParameterCommand) command).handle(guild, channel, parameters.stream().filter(s -> !s.isEmpty()).collect(Collectors.toList()));
+                    messageDeleted.set(true);
+                    if (!command.didLastMessageCausedOverviewRefresh()) {
+                        message.delete().queue();
+                    }
+                    LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
                 }
             });
 
             //Delete incoming message if in moderated channel
-            if (Arrays.asList(PsyMPlusBot.configuration.channelOverview, PsyMPlusBot.configuration.channelQuery)
+            if (Arrays.asList(PsyBot.configuration.channelOverviewName)
                     .contains(textChannel.getName()) && !messageDeleted.get()) {
                 message.delete().queue();
             }
         }
-
     }
 }

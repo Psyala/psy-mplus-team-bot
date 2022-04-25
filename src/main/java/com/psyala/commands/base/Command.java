@@ -1,17 +1,14 @@
-package com.psyala.commands;
-
-import net.dv8tion.jda.api.entities.MessageChannel;
+package com.psyala.commands.base;
 
 public abstract class Command {
     private final String command;
     private final String description;
+    protected boolean lastMessageCausedOverviewRefresh = false;
 
     public Command(String command, String description) {
         this.command = command;
         this.description = description;
     }
-
-    public abstract void handle(MessageChannel channel);
 
     public String getCommand() {
         return command;
@@ -19,5 +16,9 @@ public abstract class Command {
 
     public String getDescription() {
         return description;
+    }
+
+    public boolean didLastMessageCausedOverviewRefresh() {
+        return lastMessageCausedOverviewRefresh;
     }
 }
