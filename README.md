@@ -2,7 +2,7 @@
 
 # TODO:
 
-* Edit message rather than delete and resend (current keystone)
+* Implement getting Current Affixes ?
 * Implement boost query
 * Implement build job
 * Create WoW WA/Addon that creates output to put directly in chat

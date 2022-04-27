@@ -7,6 +7,8 @@ import com.psyala.util.DiscordInteractions;
 import com.psyala.util.MessageFormatting;
 import com.psyala.util.ResetHandler;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.internal.entities.TextChannelImpl;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
@@ -19,11 +21,12 @@ public class GuildController {
 
     private final List<Guild> validGuilds = new ArrayList<>();
     private final Map<Guild, TextChannelImpl> guildOverviewChannelMap = new HashMap<>();
+    private final Map<Guild, Message> guildOverviewMessageMap = new HashMap<>();
     private final Map<Guild, Server> guildStorageMap = new HashMap<>();
 
     public GuildController(List<Guild> guildList) {
         guildList.forEach(guild -> {
-            initialiseGuild(guild);
+            initialiseGuild(guild, true);
 
             Optional<Server> initialConfig = PsyBot.configuration.initialLoadServerState.serverList.stream()
                     .filter(server -> server.guildId == guild.getIdLong())
@@ -36,27 +39,33 @@ public class GuildController {
     }
 
     public boolean initialiseGuild(Guild guild) {
+        return initialiseGuild(guild, false);
+    }
+
+    public boolean initialiseGuild(Guild guild, boolean suppressUpdate) {
         if (validGuilds.contains(guild)) return true;
 
         Optional<TextChannelImpl> overviewChannel = DiscordInteractions.getGuildTextChannel(guild, PsyBot.configuration.channelOverviewName);
         boolean allChannelsFound = overviewChannel.isPresent();
 
         if (allChannelsFound) {
+            DiscordInteractions.cleanupTextChannel(overviewChannel.get());
             guildOverviewChannelMap.put(guild, overviewChannel.get());
             validGuilds.add(guild);
-            guildOverviewUpdated(guild);
+            if (!suppressUpdate) guildOverviewUpdated(guild);
             LOGGER.info("Initialised guild: " + guild.getName());
             return true;
         } else {
-            guild.getSystemChannel()
-                    .sendMessageEmbeds(MessageFormatting.createTextualEmbedMessage(
-                            "Server not configured correctly",
-                            "This bot requires the following text channels to be present:\r\n"
-                                    + String.join(", ", PsyBot.configuration.channelOverviewName)
-                                    + "\r\nOnce this has been done, run the initialise command."
-                            )
-                    )
-                    .queue();
+            if (guild.getSystemChannel() != null)
+                guild.getSystemChannel()
+                        .sendMessageEmbeds(MessageFormatting.createTextualEmbedMessage(
+                                "Server not configured correctly",
+                                "This bot requires the following text channels to be present:\r\n"
+                                        + String.join(", ", PsyBot.configuration.channelOverviewName)
+                                        + "\r\nOnce this has been done, run the initialise command."
+                                )
+                        )
+                        .queue();
             LOGGER.info("Failed to initialise guild: " + guild.getName());
             return false;
         }
@@ -86,7 +95,7 @@ public class GuildController {
                         StringBuilder charBuilder = new StringBuilder()
                                 .append(character.characterClass.getClassIcon())
                                 .append("` ")
-                                .append(StringUtils.rightPad(character.name, 30, " "))
+                                .append(StringUtils.rightPad(character.name, 25, " "))
                                 .append("`")
                                 .append(PsyBot.configuration.iconKeystone);
 
@@ -110,11 +119,24 @@ public class GuildController {
             output.append(String.join("\r\n\r\n", playerOutput));
         }
 
-        DiscordInteractions.cleanupTextChannel(overviewChannel);
-        overviewChannel.sendMessageEmbeds(MessageFormatting.createTextualEmbedMessage(
+        MessageEmbed messageEmb = MessageFormatting.createTextualEmbedMessage(
                 MessageFormatting.biggify("Team Keys"),
                 output.toString()
-        )).queue();
+        );
+
+        if (guildOverviewMessageMap.containsKey(guild)) {
+            guildOverviewMessageMap.get(guild)
+                    .editMessageEmbeds(messageEmb)
+                    .queue(message -> {
+                        LOGGER.info("Edited Overview Message for: ".concat(guild.getName()));
+                    });
+        } else {
+            overviewChannel.sendMessageEmbeds(messageEmb)
+                    .queue(message -> {
+                        LOGGER.info("Sent Overview Message to: ".concat(guild.getName()));
+                        guildOverviewMessageMap.put(guild, message);
+                    });
+        }
     }
 
     public TextChannelImpl getGuildOverviewChannel(Guild guild) {
