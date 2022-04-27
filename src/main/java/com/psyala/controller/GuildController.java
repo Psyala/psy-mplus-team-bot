@@ -77,22 +77,22 @@ public class GuildController {
                     playerBuilder.append(":bangbang: **No characters configured** :bangbang:");
                 } else {
                     List<String> characterOutput = new ArrayList<>();
-                    player.characterList.forEach(character -> {
+                    player.characterList.stream().sorted(Comparator.comparing(o -> o.name)).forEach(character -> {
                         StringBuilder charBuilder = new StringBuilder()
                                 .append(character.characterClass.getClassIcon())
-                                .append("`")
+                                .append("` ")
                                 .append(StringUtils.rightPad(character.name, 30, " "))
                                 .append("`")
                                 .append(PsyBot.configuration.iconKeystone);
 
                         if (character.currentKeystone == null) {
-                            charBuilder.append("`")
+                            charBuilder.append("` ")
                                     .append(StringUtils.rightPad("None", 10, " "))
                                     .append("`");
                         } else {
-                            charBuilder.append("`")
-                                    .append(StringUtils.rightPad(character.currentKeystone.dungeon.getAcronym(), 10, " "))
-                                    .append(StringUtils.leftPad(String.valueOf(character.currentKeystone.level), 2, "0"))
+                            charBuilder.append("` ")
+                                    .append(StringUtils.rightPad(character.currentKeystone.dungeon.getAcronym(), 8, " "))
+                                    .append(StringUtils.leftPad(String.valueOf(character.currentKeystone.level), 2, " "))
                                     .append("`");
                         }
 

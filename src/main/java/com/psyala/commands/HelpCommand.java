@@ -26,6 +26,8 @@ public class HelpCommand extends SimpleCommand {
 
     @Override
     public void handle(Guild guild, User author, MessageChannel channel) {
+        String information = "Commands are prefixed with the character: `!`";
+
         String commands = "**Commands**" +
                 "\r\n```" +
                 commandList.stream().map(command ->
@@ -42,7 +44,9 @@ public class HelpCommand extends SimpleCommand {
                 Arrays.stream(CharacterClass.values()).map(Enum::name).collect(Collectors.joining("\r\n• ")) +
                 "\r\n```";
 
-        String helpMessage = commands.concat("\r\n\r\n").concat(lookups);
+        String helpMessage = information.concat("\r\n\r\n")
+                .concat(commands).concat("\r\n\r\n")
+                .concat(lookups);
         author.openPrivateChannel()
                 .flatMap(privateChannel -> privateChannel.sendMessageEmbeds(MessageFormatting.createTextualEmbedMessage(":robot: Bot Help :robot:", helpMessage)))
                 .queue(success -> {

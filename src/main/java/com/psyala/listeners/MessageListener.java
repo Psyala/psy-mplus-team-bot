@@ -5,6 +5,7 @@ import com.psyala.commands.*;
 import com.psyala.commands.base.Command;
 import com.psyala.commands.base.ParameterCommand;
 import com.psyala.commands.base.SimpleCommand;
+import com.psyala.util.DiscordInteractions;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -29,6 +30,7 @@ public class MessageListener extends ListenerAdapter {
         commandList.add(new PlayerDelist());
         commandList.add(new CharacterRegister());
         commandList.add(new CharacterDelist());
+        commandList.add(new KeystoneRegister());
     }
 
     @Override
@@ -62,23 +64,23 @@ public class MessageListener extends ListenerAdapter {
                     if (splitMessage.equals("!" + command.getCommand()) && command instanceof SimpleCommand) {
                         ((SimpleCommand) command).handle(guild, author, channel);
                         messageDeleted.set(true);
-                        if (!batch) message.delete().queue();
+                        if (!batch) DiscordInteractions.deleteMessage(message);
                         LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
                     }
                     if (splitMessage.startsWith("!" + command.getCommand()) && command instanceof ParameterCommand) {
                         List<String> parameters = List.of(splitMessage.replace("!" + command.getCommand(), "").split(" "));
                         ((ParameterCommand) command).handle(guild, author, channel, parameters.stream().filter(s -> !s.isEmpty()).collect(Collectors.toList()));
                         messageDeleted.set(true);
-                        if (!batch) message.delete().queue();
+                        if (!batch) DiscordInteractions.deleteMessage(message);
                         LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
                     }
                 });
-                if (batch) message.delete().queue();
+                if (batch) DiscordInteractions.deleteMessage(message);
 
                 //Delete incoming message if in moderated channel
                 if (Arrays.asList(PsyBot.configuration.channelOverviewName)
                         .contains(textChannel.getName()) && !messageDeleted.get()) {
-                    message.delete().queue();
+                    DiscordInteractions.deleteMessage(message);
                 }
             });
         }
