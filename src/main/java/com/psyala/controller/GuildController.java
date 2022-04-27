@@ -7,6 +7,7 @@ import com.psyala.util.DiscordInteractions;
 import com.psyala.util.MessageFormatting;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.internal.entities.TextChannelImpl;
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +63,6 @@ public class GuildController {
 
     public void guildOverviewUpdated(Guild guild) {
         TextChannelImpl overviewChannel = guildOverviewChannelMap.get(guild);
-        DiscordInteractions.cleanupTextChannel(overviewChannel);
 
         StringBuilder output = new StringBuilder();
         if (!guildStorageMap.containsKey(guild) || guildStorageMap.get(guild).playerList.isEmpty()) {
@@ -74,29 +74,25 @@ public class GuildController {
                 playerBuilder.append("**").append(player.name).append("**\r\n");
 
                 if (player.characterList.isEmpty()) {
-                    playerBuilder
-                            .append(MessageFormatting.TAB)
-                            .append(":bangbang: **No characters configured** :bangbang:");
+                    playerBuilder.append(":bangbang: **No characters configured** :bangbang:");
                 } else {
                     List<String> characterOutput = new ArrayList<>();
                     player.characterList.forEach(character -> {
                         StringBuilder charBuilder = new StringBuilder()
-                                .append(MessageFormatting.TAB)
-                                .append(character.name)
-                                .append(MessageFormatting.TAB)
-                                .append(":class_").append(character.characterClass.name().toLowerCase()).append(":")
-                                .append(MessageFormatting.TAB)
-                                .append(":key: ");
+                                .append(character.characterClass.getClassIcon())
+                                .append("`")
+                                .append(StringUtils.rightPad(character.name, 30, " "))
+                                .append("`")
+                                .append(PsyBot.configuration.iconKeystone);
 
                         if (character.currentKeystone == null) {
-                            charBuilder.append("None")
-                                    .append(MessageFormatting.BLANK)
-                                    .append(":bangbang:");
+                            charBuilder.append("`")
+                                    .append(StringUtils.rightPad("None", 10, " "))
+                                    .append("`");
                         } else {
-                            charBuilder.append(character.currentKeystone.dungeon)
-                                    .append(MessageFormatting.BLANK)
-                                    .append("`")
-                                    .append(character.currentKeystone.level)
+                            charBuilder.append("`")
+                                    .append(StringUtils.rightPad(character.currentKeystone.dungeon.getAcronym(), 10, " "))
+                                    .append(StringUtils.leftPad(String.valueOf(character.currentKeystone.level), 2, "0"))
                                     .append("`");
                         }
 
@@ -109,6 +105,7 @@ public class GuildController {
             output.append(String.join("\r\n\r\n", playerOutput));
         }
 
+        DiscordInteractions.cleanupTextChannel(overviewChannel);
         overviewChannel.sendMessageEmbeds(MessageFormatting.createTextualEmbedMessage(
                 MessageFormatting.biggify("Team Keys"),
                 output.toString()
@@ -136,5 +133,7 @@ public class GuildController {
         serverList.serverList = new ArrayList<>(guildStorageMap.values());
         return serverList;
     }
+
+
 }
 

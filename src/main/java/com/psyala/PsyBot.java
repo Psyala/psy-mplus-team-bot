@@ -43,7 +43,7 @@ public class PsyBot {
                 try {
                     configuration.saveStateJson = JsonParser.toJson(guildController.getServerList());
                 } catch (Exception ex) {
-                    configuration.saveStateJson = "{\"serverList\"\\:[]}";
+                    configuration.saveStateJson = "{\"serverList\":[]}";
                 }
                 configLoader.saveConfiguration(configuration);
                 try {

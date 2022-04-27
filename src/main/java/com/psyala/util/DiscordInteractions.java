@@ -21,10 +21,13 @@ public class DiscordInteractions {
     public static void cleanupTextChannel(TextChannelImpl textChannel) {
         textChannel.getIterableHistory()
                 .forEach(message -> {
-                            try {
-                                message.delete().queue();
-                            } catch (Exception ex) {
-                            }
+                            message.delete()
+                                    .queue(
+                                            unused -> {
+                                            },
+                                            throwable -> {
+                                            }
+                                    );
                         }
                 );
     }

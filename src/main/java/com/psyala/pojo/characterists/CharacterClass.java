@@ -1,5 +1,7 @@
 package com.psyala.pojo.characterists;
 
+import com.psyala.PsyBot;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,5 +35,36 @@ public enum CharacterClass {
 
     public List<TrinketClass> getTrinketClassList() {
         return trinketClassList;
+    }
+
+    public String getClassIcon() {
+        switch (this) {
+            case PRIEST:
+                return PsyBot.configuration.iconClassPriest;
+            case MAGE:
+                return PsyBot.configuration.iconClassMage;
+            case WARLOCK:
+                return PsyBot.configuration.iconClassWarlock;
+            case DEMON_HUNTER:
+                return PsyBot.configuration.iconClassDemonHunter;
+            case ROGUE:
+                return PsyBot.configuration.iconClassRogue;
+            case MONK:
+                return PsyBot.configuration.iconClassMonk;
+            case DRUID:
+                return PsyBot.configuration.iconClassDruid;
+            case HUNTER:
+                return PsyBot.configuration.iconClassHunter;
+            case SHAMAN:
+                return PsyBot.configuration.iconClassShaman;
+            case WARRIOR:
+                return PsyBot.configuration.iconClassWarrior;
+            case DEATH_KNIGHT:
+                return PsyBot.configuration.iconClassDeathKnight;
+            case PALADIN:
+                return PsyBot.configuration.iconClassPaladin;
+            default:
+                return ":question:";
+        }
     }
 }

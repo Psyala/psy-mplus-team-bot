@@ -6,8 +6,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import java.util.Arrays;
 
 public class MessageFormatting {
-    public static String BLANK = "\u1CBC";
-    public static String TAB = BLANK.concat(BLANK).concat(BLANK);
 
     public static MessageEmbed createTextualEmbedMessage(String title, String messageContents) {
         return new MessageEmbed(
