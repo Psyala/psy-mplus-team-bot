@@ -3,8 +3,10 @@ package com.psyala;
 import com.psyala.controller.GuildController;
 import com.psyala.listeners.MessageListener;
 import com.psyala.pojo.Configuration;
+import com.psyala.pojo.Server;
 import com.psyala.util.ConfigLoader;
 import com.psyala.util.JsonParser;
+import com.psyala.util.ResetHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -13,9 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class PsyBot {
     private static final Logger LOGGER = LoggerFactory.getLogger(PsyBot.class);
+    private static final Timer resetTimer = new Timer("Reset Timer");
     private static JDA discordBot;
 
     public static int MESSAGE_DELETE_TIME = 10;
@@ -55,6 +60,26 @@ public class PsyBot {
             }));
 
             guildController = new GuildController(discordBot.getGuilds());
+
+            resetTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    boolean hasResetHappened = ResetHandler.getInstance().hasResetHappened();
+                    if (hasResetHappened) {
+                        guildController.getValidGuilds().forEach(guild -> {
+                            Server defaultServer = new Server();
+                            defaultServer.guildId = guild.getIdLong();
+
+                            guildController.getGuildStorageObject(guild, defaultServer)
+                                    .playerList.forEach(player -> {
+                                player.characterList.forEach(character -> character.currentKeystone = null);
+                            });
+                            
+                            guildController.guildOverviewUpdated(guild);
+                        });
+                    }
+                }
+            }, 60000);
 
             LOGGER.info("Initialised");
         } catch (Exception ex) {

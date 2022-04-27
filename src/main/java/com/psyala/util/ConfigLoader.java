@@ -17,7 +17,7 @@ public class ConfigLoader {
     private static final String file = "/config.properties";
     private static final String cfg_botToken = "cfg.botToken";
     private static final String cfg_resetDay = "cfg.resetDay";
-    private static final String cfg_resetHourUtc = "cfg.resetHourUtc";
+    private static final String cfg_resetHourUtc = "cfg.resetHour";
     private static final String cfg_channelOverview = "cfg.channelOverview";
     private static final String cfg_iconKeystone = "cfg.iconKeystone";
     private static final String cfg_iconClassPriest = "cfg.iconClassPriest";
@@ -53,7 +53,7 @@ public class ConfigLoader {
             return Optional.of(new Configuration(
                     properties.getProperty(cfg_botToken, ""),
                     properties.getProperty(cfg_resetDay, "Wednesday"),
-                    Integer.parseInt(properties.getProperty(cfg_resetHourUtc, "7")),
+                    Integer.parseInt(properties.getProperty(cfg_resetHourUtc, "8")),
                     properties.getProperty(cfg_channelOverview, "current-keys"),
                     serversList,
                     properties.getProperty(cfg_iconKeystone, "<:keystone:968915657003511828>"),

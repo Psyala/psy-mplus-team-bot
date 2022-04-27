@@ -2,8 +2,7 @@
 
 # TODO:
 
-* Implement calculating next reset and displaying
-* Implement auto resetting saved keys on reset day
+* Edit message rather than delete and resend (current keystone)
 * Implement boost query
 * Implement build job
 * Create WoW WA/Addon that creates output to put directly in chat

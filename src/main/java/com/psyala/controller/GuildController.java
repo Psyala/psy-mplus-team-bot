@@ -5,6 +5,7 @@ import com.psyala.pojo.Server;
 import com.psyala.pojo.ServerList;
 import com.psyala.util.DiscordInteractions;
 import com.psyala.util.MessageFormatting;
+import com.psyala.util.ResetHandler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.internal.entities.TextChannelImpl;
 import org.codehaus.plexus.util.StringUtils;
@@ -65,6 +66,10 @@ public class GuildController {
         TextChannelImpl overviewChannel = guildOverviewChannelMap.get(guild);
 
         StringBuilder output = new StringBuilder();
+        output.append("**Reset Day:** :calendar: ")
+                .append(ResetHandler.getInstance().getNextResetDay().format(ResetHandler.DATE_FORMAT))
+                .append("\r\n\r\n");
+
         if (!guildStorageMap.containsKey(guild) || guildStorageMap.get(guild).playerList.isEmpty()) {
             output.append(":bangbang: **No players configured** :bangbang:");
         } else {
