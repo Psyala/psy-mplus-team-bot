@@ -25,6 +25,7 @@ public class MessageListener extends ListenerAdapter {
 
     public MessageListener() {
         commandList.add(new HelpCommand(commandList));
+        commandList.add(new CommandsCommand(commandList));
         commandList.add(new InitialiseGuild());
         commandList.add(new PlayerRegister());
         commandList.add(new PlayerDelist());

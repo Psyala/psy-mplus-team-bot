@@ -20,7 +20,11 @@ public class HelpCommand extends SimpleCommand {
     private final List<Command> commandList;
 
     public HelpCommand(List<Command> commandList) {
-        super("help", "Get a list of commands");
+        this("help", "Get a list of commands", commandList);
+    }
+
+    public HelpCommand(String command, String description, List<Command> commandList) {
+        super(command, description);
         this.commandList = commandList;
     }
 
