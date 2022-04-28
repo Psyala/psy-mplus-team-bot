@@ -34,8 +34,7 @@ public class PlayerDelist extends ParameterCommand {
                 if (server.playerList.stream().anyMatch(player -> player.name.equalsIgnoreCase(playerName))) {
                     server.playerList.removeIf(player -> player.name.equalsIgnoreCase(playerName));
                     responseMessage = "Player removed: " + playerName;
-                    PsyBot.guildController.saveGuildStorageObject(guild, server);
-                    PsyBot.guildController.guildOverviewUpdated(guild);
+                    PsyBot.guildController.updateGuildStorageObject(guild, server);
                 } else {
                     responseMessage = "Player doesn't exist: " + playerName;
                 }
@@ -44,8 +43,8 @@ public class PlayerDelist extends ParameterCommand {
 
         if (!responseMessage.isEmpty())
             channel.sendMessageEmbeds(
-                    MessageFormatting.createTextualEmbedMessage("Delist Player Response", responseMessage)
-            )
+                            MessageFormatting.createTextualEmbedMessage("Delist Player Response", responseMessage)
+                    )
                     .delay(PsyBot.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
                     .queue();

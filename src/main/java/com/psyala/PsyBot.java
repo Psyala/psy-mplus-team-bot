@@ -5,7 +5,6 @@ import com.psyala.listeners.MessageListener;
 import com.psyala.pojo.Configuration;
 import com.psyala.pojo.Server;
 import com.psyala.util.ConfigLoader;
-import com.psyala.util.JsonParser;
 import com.psyala.util.ResetHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -45,11 +44,7 @@ public class PsyBot {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 LOGGER.info("Starting Shutdown");
                 discordBot.shutdownNow();
-                try {
-                    configuration.saveStateJson = JsonParser.toJson(guildController.getServerList());
-                } catch (Exception ex) {
-                    configuration.saveStateJson = "{\"serverList\":[]}";
-                }
+                configuration.saveStateJson = guildController.getServerListJson();
                 configLoader.saveConfiguration(configuration);
                 try {
                     Thread.sleep(5000);
@@ -59,9 +54,9 @@ public class PsyBot {
                 LOGGER.info("Shutdown");
             }));
 
-            guildController = new GuildController(discordBot.getGuilds());
+            guildController = new GuildController(discordBot.getGuilds(), configLoader);
 
-            resetTimer.schedule(new TimerTask() {
+            resetTimer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
                     boolean hasResetHappened = ResetHandler.getInstance().hasResetHappened();
@@ -70,16 +65,17 @@ public class PsyBot {
                             Server defaultServer = new Server();
                             defaultServer.guildId = guild.getIdLong();
 
-                            guildController.getGuildStorageObject(guild, defaultServer)
-                                    .playerList.forEach(player -> {
+                            Server dataObject = guildController.getGuildStorageObject(guild, defaultServer);
+
+                            dataObject.playerList.forEach(player -> {
                                 player.characterList.forEach(character -> character.currentKeystone = null);
                             });
-                            
-                            guildController.guildOverviewUpdated(guild);
+
+                            guildController.updateGuildStorageObject(guild, dataObject);
                         });
                     }
                 }
-            }, 60000);
+            }, 60000, 60000);
 
             LOGGER.info("Initialised");
         } catch (Exception ex) {
@@ -87,6 +83,4 @@ public class PsyBot {
             System.exit(-1);
         }
     }
-
-
 }

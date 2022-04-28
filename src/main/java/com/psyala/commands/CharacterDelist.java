@@ -39,12 +39,10 @@ public class CharacterDelist extends ParameterCommand {
                         .findFirst();
                 if (playerO.isPresent()) {
                     playerO.get().characterList.removeIf(c -> c.name.equalsIgnoreCase(characterName));
-                    PsyBot.guildController.saveGuildStorageObject(guild, server);
-                    PsyBot.guildController.guildOverviewUpdated(guild);
+                    PsyBot.guildController.updateGuildStorageObject(guild, server);
                 } else {
                     responseMessage = "Could not find character: " + characterName;
                 }
-
             } catch (IndexOutOfBoundsException ex) {
                 responseMessage = "Not all parameters are present";
             } catch (IllegalArgumentException ex) {
@@ -54,8 +52,8 @@ public class CharacterDelist extends ParameterCommand {
 
         if (!responseMessage.isEmpty())
             channel.sendMessageEmbeds(
-                    MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
-            )
+                            MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
+                    )
                     .delay(PsyBot.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
                     .queue();

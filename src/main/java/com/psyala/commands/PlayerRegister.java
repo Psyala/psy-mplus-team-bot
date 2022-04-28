@@ -38,16 +38,15 @@ public class PlayerRegister extends ParameterCommand {
                     Player newPlayer = new Player();
                     newPlayer.name = playerName;
                     server.playerList.add(newPlayer);
-                    PsyBot.guildController.saveGuildStorageObject(guild, server);
-                    PsyBot.guildController.guildOverviewUpdated(guild);
+                    PsyBot.guildController.updateGuildStorageObject(guild, server);
                 }
             }
         }
 
         if (!responseMessage.isEmpty())
             channel.sendMessageEmbeds(
-                    MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
-            )
+                            MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
+                    )
                     .delay(PsyBot.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
                     .queue();

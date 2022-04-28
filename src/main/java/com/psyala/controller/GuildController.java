@@ -3,9 +3,7 @@ package com.psyala.controller;
 import com.psyala.PsyBot;
 import com.psyala.pojo.Server;
 import com.psyala.pojo.ServerList;
-import com.psyala.util.DiscordInteractions;
-import com.psyala.util.MessageFormatting;
-import com.psyala.util.ResetHandler;
+import com.psyala.util.*;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -15,16 +13,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GuildController {
     private static final Logger LOGGER = LoggerFactory.getLogger(GuildController.class);
 
+    private final ConfigLoader configLoader;
+    private final Timer saveDataTimer = new Timer("Save Data Timer");
     private final List<Guild> validGuilds = new ArrayList<>();
     private final Map<Guild, TextChannelImpl> guildOverviewChannelMap = new HashMap<>();
     private final Map<Guild, Message> guildOverviewMessageMap = new HashMap<>();
     private final Map<Guild, Server> guildStorageMap = new HashMap<>();
+    private AtomicBoolean dataDirty = new AtomicBoolean();
 
-    public GuildController(List<Guild> guildList) {
+    public GuildController(List<Guild> guildList, ConfigLoader configLoader) {
+        this.configLoader = configLoader;
         guildList.forEach(guild -> {
             initialiseGuild(guild, true);
 
@@ -36,6 +39,17 @@ public class GuildController {
                 guildOverviewUpdated(guild);
             }
         });
+
+        saveDataTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (dataDirty.get()) {
+                    PsyBot.configuration.saveStateJson = getServerListJson();
+                    configLoader.saveConfiguration(PsyBot.configuration);
+                    dataDirty.set(false);
+                }
+            }
+        }, 60000, 60000);
     }
 
     public boolean initialiseGuild(Guild guild) {
@@ -59,10 +73,10 @@ public class GuildController {
             if (guild.getSystemChannel() != null)
                 guild.getSystemChannel()
                         .sendMessageEmbeds(MessageFormatting.createTextualEmbedMessage(
-                                "Server not configured correctly",
-                                "This bot requires the following text channels to be present:\r\n"
-                                        + String.join(", ", PsyBot.configuration.channelOverviewName)
-                                        + "\r\nOnce this has been done, run the initialise command."
+                                        "Server not configured correctly",
+                                        "This bot requires the following text channels to be present:\r\n"
+                                                + String.join(", ", PsyBot.configuration.channelOverviewName)
+                                                + "\r\nOnce this has been done, run the initialise command."
                                 )
                         )
                         .queue();
@@ -71,7 +85,7 @@ public class GuildController {
         }
     }
 
-    public void guildOverviewUpdated(Guild guild) {
+    private void guildOverviewUpdated(Guild guild) {
         TextChannelImpl overviewChannel = guildOverviewChannelMap.get(guild);
 
         StringBuilder output = new StringBuilder();
@@ -147,20 +161,25 @@ public class GuildController {
         return guildStorageMap.getOrDefault(guild, defaultValue);
     }
 
-    public void saveGuildStorageObject(Guild guild, Server server) {
+    public void updateGuildStorageObject(Guild guild, Server server) {
         guildStorageMap.put(guild, server);
+        guildOverviewUpdated(guild);
+        dataDirty.set(true);
     }
 
     public List<Guild> getValidGuilds() {
         return validGuilds;
     }
 
-    public ServerList getServerList() {
-        ServerList serverList = new ServerList();
-        serverList.serverList = new ArrayList<>(guildStorageMap.values());
-        return serverList;
+    public String getServerListJson() {
+        try {
+            ServerList serverList = new ServerList();
+            serverList.serverList = new ArrayList<>(guildStorageMap.values());
+            return JsonParser.toJson(serverList);
+        } catch (Exception ex) {
+            return "{\"serverList\":[]}";
+        }
     }
-
-
 }
+
 

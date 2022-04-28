@@ -46,13 +46,10 @@ public class KeystoneRegister extends ParameterCommand {
                     keystone.level = dungeonLevel;
                     character.currentKeystone = keystone;
 
-                    PsyBot.guildController.saveGuildStorageObject(guild, server);
-                    PsyBot.guildController.guildOverviewUpdated(guild);
-
+                    PsyBot.guildController.updateGuildStorageObject(guild, server);
                 } else {
                     responseMessage = "Could not find player for character: " + characterName;
                 }
-
             } catch (IndexOutOfBoundsException ex) {
                 responseMessage = "Not all parameters are present";
             } catch (NumberFormatException ex) {
@@ -64,8 +61,8 @@ public class KeystoneRegister extends ParameterCommand {
 
         if (!responseMessage.isEmpty())
             channel.sendMessageEmbeds(
-                    MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
-            )
+                            MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
+                    )
                     .delay(PsyBot.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
                     .queue();

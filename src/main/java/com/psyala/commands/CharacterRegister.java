@@ -51,13 +51,11 @@ public class CharacterRegister extends ParameterCommand {
                         character.currentKeystone = null;
                         playerO.get().characterList.add(character);
 
-                        PsyBot.guildController.saveGuildStorageObject(guild, server);
-                        PsyBot.guildController.guildOverviewUpdated(guild);
+                        PsyBot.guildController.updateGuildStorageObject(guild, server);
                     }
                 } else {
                     responseMessage = "Could not find player: " + playerName;
                 }
-
             } catch (IndexOutOfBoundsException ex) {
                 responseMessage = "Not all parameters are present";
             } catch (IllegalArgumentException ex) {
@@ -67,8 +65,8 @@ public class CharacterRegister extends ParameterCommand {
 
         if (!responseMessage.isEmpty())
             channel.sendMessageEmbeds(
-                    MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
-            )
+                            MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
+                    )
                     .delay(PsyBot.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
                     .queue();
