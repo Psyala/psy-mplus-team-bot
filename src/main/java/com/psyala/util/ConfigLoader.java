@@ -99,6 +99,7 @@ public class ConfigLoader {
             properties.setProperty(cfg_iconClassPaladin, configuration.iconClassPaladin);
 
             properties.store(stream, "Comments");
+            LOGGER.info("Saved configuration to file.");
         } catch (Exception ex) {
             LOGGER.error("Error saving configuration file", ex);
         }

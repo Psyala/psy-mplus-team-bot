@@ -31,13 +31,16 @@ public class GuildController {
         guildList.forEach(guild -> {
             initialiseGuild(guild, true);
 
-            Optional<Server> initialConfig = PsyBot.configuration.initialLoadServerState.serverList.stream()
+            Server defaultServer = new Server();
+            defaultServer.guildId = guild.getIdLong();
+
+            Server serverConfig = PsyBot.configuration.initialLoadServerState.serverList.stream()
                     .filter(server -> server.guildId == guild.getIdLong())
-                    .findFirst();
-            if (initialConfig.isPresent()) {
-                guildStorageMap.put(guild, initialConfig.get());
-                guildOverviewUpdated(guild);
-            }
+                    .findFirst()
+                    .orElse(defaultServer);
+
+            guildStorageMap.put(guild, serverConfig);
+            guildOverviewUpdated(guild);
         });
 
         saveDataTimer.scheduleAtFixedRate(new TimerTask() {
@@ -49,7 +52,7 @@ public class GuildController {
                     dataDirty.set(false);
                 }
             }
-        }, 60000, 60000);
+        }, 5000, 60000);
     }
 
     public boolean initialiseGuild(Guild guild) {
