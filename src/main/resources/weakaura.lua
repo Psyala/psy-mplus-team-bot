@@ -15,24 +15,82 @@ local function isSavedInstancesLoaded()
     return IsAddOnLoaded("SavedInstances")
 end
 
-local function getCommandForItemLink(itemLink, charName)
+local function getKeyObjectForItemLink(itemLink)
     local _, itemId, mapId, mapLevel = strsplit(':', itemLink)
     local abbrev = keyIdToAbbrevMap[tonumber(mapId)]
-    local keystoneCommand = "!keystone " .. charName .. " " .. abbrev .. " " .. mapLevel
+    return {
+        itemLink = itemLink,
+        itemId = itemId,
+        mapId = mapId,
+        mapLevel = mapLevel,
+        mapAbbrev = abbrev
+    }
+end
+
+local function getCommandForItemLink(itemLink, charName)
+    local keyObject = getKeyObjectForItemLink(itemLink)
+    local keystoneCommand = "!keystone " .. charName:gsub(" ", "") .. " " .. keyObject.mapAbbrev .. " " .. keyObject.mapLevel
     return keystoneCommand
+end
+
+local function getKeyFromBags()
+    for bagId = 0, 4 do
+        for invId = 1, GetContainerNumSlots(bagId) do
+            local itemId = GetContainerItemID(bagId, invId)
+            if itemId and itemId == 180653 then
+                local itemLink = GetContainerItemLink(bagId, invId)
+                return itemLink
+            end
+        end
+    end
+
+    return nil
+end
+
+local function ProcessKey(itemLink, targetTable)
+    local SI = _G.SavedInstances[1]
+    local _, _, mapID, mapLevel = strsplit(':', itemLink)
+    mapID = tonumber(mapID)
+    mapLevel = tonumber(mapLevel)
+
+    targetTable.link = itemLink
+    targetTable.mapID = mapID
+    targetTable.level = mapLevel
+    targetTable.name = C_ChallengeMode.GetMapUIInfo(mapID)
+    targetTable.color = "ffffffff"
+    targetTable.ResetTime = SI.GetNextWeeklyResetTime()
+end
+
+local function refreshMythicKeyInfoSI()
+    local SI = _G.SavedInstances[1]
+    local t = SI.db.Toons[SI.thisToon]
+    t.MythicKey = wipe(t.MythicKey or {})
+    t.TimewornMythicKey = wipe(t.TimewornMythicKey or {})
+    for bagID = 0, 4 do
+        for invID = 1, GetContainerNumSlots(bagID) do
+            local itemID = GetContainerItemID(bagID, invID)
+            if itemID and itemID == 180653 then
+                ProcessKey(GetContainerItemLink(bagID, invID), t.MythicKey)
+            elseif itemID and itemID == 187786 then
+                ProcessKey(GetContainerItemLink(bagID, invID), t.TimewornMythicKey)
+            end
+        end
+    end
+    SI.db.Toons[SI.thisToon] = t
 end
 
 local function getKeystoneCommandsFromSI()
     local SI = _G.SavedInstances[1]
     local toons = SI.db.Toons
 
+    refreshMythicKeyInfoSI()
+
     local commands = ""
 
     for charName, toon in pairs(toons) do
-        local char = charName:gsub(" ", "")
         local keyLink = toon.MythicKey.link
         if keyLink then
-            commands = commands .. getCommandForItemLink(keyLink, char) .. "\n"
+            commands = commands .. getCommandForItemLink(keyLink, charName) .. "\n"
         end
     end
 
@@ -43,28 +101,20 @@ local function getKeystoneCommand()
     if (isSavedInstancesLoaded()) then
         return getKeystoneCommandsFromSI()
     else
-        for bagId = 0, 4 do
-            for invId = 1, GetContainerNumSlots(bagId) do
-                local itemId = GetContainerItemID(bagId, invId)
-                if itemId and itemId == 180653 then
-                    local itemLink = GetContainerItemLink(bagId, invId)
-                    local name = UnitName("player")
-                    local realm = GetRealmName()
-                    local charName = name .. "-" .. realm
-                    return getCommandForItemLink(itemLink, charName)
-                end
-            end
-        end
+        local itemLink = getKeyFromBags()
+        local name = UnitName("player")
+        local realm = GetRealmName()
+        local charName = name .. "-" .. realm
+        return getCommandForItemLink(itemLink, charName)
     end
 end
 
-local BeltipMythicPlusHelperFrame = nil
-local function showFrame(text)
-    if not BeltipMythicPlusHelperFrame then
+local function showFrame(text, manualShow)
+    if not _G.BeltipMythicPlusHelperFrame then
         -- Main Frame
         local f = CreateFrame("Frame", "BeltipMythicPlusHelperFrame", UIParent, "DialogBoxFrame")
         -- load position from local DB
-        f:SetPoint("CENTER")
+        f:SetPoint("RIGHT")
         f:SetSize(400, 200)
         f:SetBackdrop({
             bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -124,11 +174,13 @@ local function showFrame(text)
             eb:SetWidth(sf:GetWidth())
         end)
 
-        BeltipMythicPlusHelperFrame = f
+        _G.BeltipMythicPlusHelperFrame = f
     end
     BeltipMythicPlusHelperEditBox:SetText(text)
-    BeltipMythicPlusHelperEditBox:HighlightText()
-    return BeltipMythicPlusHelperFrame
+    if manualShow then
+        BeltipMythicPlusHelperEditBox:HighlightText()
+    end
+    return _G.BeltipMythicPlusHelperFrame
 end
 
 local LDB = LibStub("LibDataBroker-1.1")
@@ -150,7 +202,7 @@ aura_env.LDBDisplay = aura_env.LDBDisplay or LDB:NewDataObject("BeltipMythicPlus
     text = "Open Beltip Mythic Keystone Helper",
     icon = 460856,
     OnClick = function()
-        local f = showFrame(getKeystoneCommand())
+        local f = showFrame(getKeystoneCommand(), true)
         f:Show()
         recheckIcon()
     end,
@@ -175,3 +227,9 @@ if registered then
         LDBIcon:Show("BeltipMythicPlusHelperDBI")
     end
 end
+
+aura_env.showFrame = function()
+    local f = showFrame(getKeystoneCommand(), false)
+    f:Show()
+end
+
