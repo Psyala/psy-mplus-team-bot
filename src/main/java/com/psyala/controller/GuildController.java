@@ -1,6 +1,6 @@
 package com.psyala.controller;
 
-import com.psyala.PsyBot;
+import com.psyala.Beltip;
 import com.psyala.pojo.Server;
 import com.psyala.pojo.ServerList;
 import com.psyala.util.*;
@@ -34,7 +34,7 @@ public class GuildController {
             Server defaultServer = new Server();
             defaultServer.guildId = guild.getIdLong();
 
-            Server serverConfig = PsyBot.configuration.initialLoadServerState.serverList.stream()
+            Server serverConfig = Beltip.configuration.initialLoadServerState.serverList.stream()
                     .filter(server -> server.guildId == guild.getIdLong())
                     .findFirst()
                     .orElse(defaultServer);
@@ -47,8 +47,8 @@ public class GuildController {
             @Override
             public void run() {
                 if (dataDirty.get()) {
-                    PsyBot.configuration.saveStateJson = getServerListJson();
-                    configLoader.saveConfiguration(PsyBot.configuration);
+                    Beltip.configuration.saveStateJson = getServerListJson();
+                    configLoader.saveConfiguration(Beltip.configuration);
                     dataDirty.set(false);
                 }
             }
@@ -62,7 +62,7 @@ public class GuildController {
     public boolean initialiseGuild(Guild guild, boolean suppressUpdate) {
         if (validGuilds.contains(guild)) return true;
 
-        Optional<TextChannelImpl> overviewChannel = DiscordInteractions.getGuildTextChannel(guild, PsyBot.configuration.channelOverviewName);
+        Optional<TextChannelImpl> overviewChannel = DiscordInteractions.getGuildTextChannel(guild, Beltip.configuration.channelOverviewName);
         boolean allChannelsFound = overviewChannel.isPresent();
 
         if (allChannelsFound) {
@@ -76,10 +76,10 @@ public class GuildController {
             if (guild.getSystemChannel() != null)
                 guild.getSystemChannel()
                         .sendMessageEmbeds(MessageFormatting.createTextualEmbedMessage(
-                                        "Server not configured correctly",
-                                        "This bot requires the following text channels to be present:\r\n"
-                                                + String.join(", ", PsyBot.configuration.channelOverviewName)
-                                                + "\r\nOnce this has been done, run the initialise command."
+                                "Server not configured correctly",
+                                "This bot requires the following text channels to be present:\r\n"
+                                        + String.join(", ", Beltip.configuration.channelOverviewName)
+                                        + "\r\n\r\nOnce this has been done, run the initialise command."
                                 )
                         )
                         .queue();
@@ -111,17 +111,17 @@ public class GuildController {
                     player.characterList.stream().sorted(Comparator.comparing(o -> o.name)).forEach(character -> {
                         StringBuilder charBuilder = new StringBuilder()
                                 .append(character.characterClass.getClassIcon())
-                                .append("` ")
+                                .append(" `")
                                 .append(StringUtils.rightPad(character.name, 25, " "))
-                                .append("`")
-                                .append(PsyBot.configuration.iconKeystone);
+                                .append("` ")
+                                .append(Beltip.configuration.iconKeystone);
 
                         if (character.currentKeystone == null) {
-                            charBuilder.append("` ")
+                            charBuilder.append(" `")
                                     .append(StringUtils.rightPad("None", 10, " "))
                                     .append("`");
                         } else {
-                            charBuilder.append("` ")
+                            charBuilder.append(" `")
                                     .append(StringUtils.rightPad(character.currentKeystone.dungeon.getAcronym(), 8, " "))
                                     .append(StringUtils.leftPad(String.valueOf(character.currentKeystone.level), 2, " "))
                                     .append("`");
@@ -148,11 +148,12 @@ public class GuildController {
                         LOGGER.info("Edited Overview Message for: ".concat(guild.getName()));
                     });
         } else {
-            overviewChannel.sendMessageEmbeds(messageEmb)
-                    .queue(message -> {
-                        LOGGER.info("Sent Overview Message to: ".concat(guild.getName()));
-                        guildOverviewMessageMap.put(guild, message);
-                    });
+            if (overviewChannel != null)
+                overviewChannel.sendMessageEmbeds(messageEmb)
+                        .queue(message -> {
+                            LOGGER.info("Sent Overview Message to: ".concat(guild.getName()));
+                            guildOverviewMessageMap.put(guild, message);
+                        });
         }
     }
 

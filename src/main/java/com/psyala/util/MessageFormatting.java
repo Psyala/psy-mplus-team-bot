@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.EmbedType;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class MessageFormatting {
 
@@ -12,6 +13,14 @@ public class MessageFormatting {
                 null, title, messageContents, EmbedType.RICH,
                 null, 123456, null, null, null,
                 null, null, null, null
+        );
+    }
+
+    public static MessageEmbed createFieldEmbedMessage(String title, List<MessageEmbed.Field> fieldList) {
+        return new MessageEmbed(
+                null, title, null, EmbedType.RICH,
+                null, 123456, null, null, null,
+                null, null, null, fieldList
         );
     }
 

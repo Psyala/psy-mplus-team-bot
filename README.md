@@ -2,8 +2,5 @@
 
 # TODO:
 
-* Implement getting Current Affixes ?
-* Implement boost query
-* Implement build job
-* Implement logging to file
 * Set up hosting
+* Implement boost query

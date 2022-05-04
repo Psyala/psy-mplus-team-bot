@@ -1,6 +1,6 @@
 package com.psyala.commands;
 
-import com.psyala.PsyBot;
+import com.psyala.Beltip;
 import com.psyala.commands.base.ParameterCommand;
 import com.psyala.pojo.Player;
 import com.psyala.pojo.Server;
@@ -29,7 +29,7 @@ public class PlayerRegister extends ParameterCommand {
             if (playerName.trim().isEmpty()) {
                 responseMessage = "No player name specified";
             } else {
-                Server server = PsyBot.guildController.getGuildStorageObject(guild, new Server());
+                Server server = Beltip.guildController.getGuildStorageObject(guild, new Server());
                 server.guildId = guild.getIdLong();
 
                 if (server.playerList.stream().anyMatch(player -> player.name.equalsIgnoreCase(playerName))) {
@@ -38,16 +38,16 @@ public class PlayerRegister extends ParameterCommand {
                     Player newPlayer = new Player();
                     newPlayer.name = playerName;
                     server.playerList.add(newPlayer);
-                    PsyBot.guildController.updateGuildStorageObject(guild, server);
+                    Beltip.guildController.updateGuildStorageObject(guild, server);
                 }
             }
         }
 
         if (!responseMessage.isEmpty())
             channel.sendMessageEmbeds(
-                            MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
-                    )
-                    .delay(PsyBot.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
+                    MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
+            )
+                    .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
                     .queue();
     }

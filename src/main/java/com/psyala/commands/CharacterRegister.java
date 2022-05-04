@@ -1,6 +1,6 @@
 package com.psyala.commands;
 
-import com.psyala.PsyBot;
+import com.psyala.Beltip;
 import com.psyala.commands.base.ParameterCommand;
 import com.psyala.pojo.Player;
 import com.psyala.pojo.Server;
@@ -32,7 +32,7 @@ public class CharacterRegister extends ParameterCommand {
                 String characterName = parameters.get(1);
                 String characterClass = parameters.get(2);
 
-                Server server = PsyBot.guildController.getGuildStorageObject(guild, new Server());
+                Server server = Beltip.guildController.getGuildStorageObject(guild, new Server());
                 server.guildId = guild.getIdLong();
 
                 Optional<Player> playerO = server.playerList.stream().filter(player -> player.name.equalsIgnoreCase(playerName)).findFirst();
@@ -51,7 +51,7 @@ public class CharacterRegister extends ParameterCommand {
                         character.currentKeystone = null;
                         playerO.get().characterList.add(character);
 
-                        PsyBot.guildController.updateGuildStorageObject(guild, server);
+                        Beltip.guildController.updateGuildStorageObject(guild, server);
                     }
                 } else {
                     responseMessage = "Could not find player: " + playerName;
@@ -65,9 +65,9 @@ public class CharacterRegister extends ParameterCommand {
 
         if (!responseMessage.isEmpty())
             channel.sendMessageEmbeds(
-                            MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
-                    )
-                    .delay(PsyBot.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
+                    MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
+            )
+                    .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
                     .queue();
     }

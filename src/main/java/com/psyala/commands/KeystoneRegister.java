@@ -1,6 +1,6 @@
 package com.psyala.commands;
 
-import com.psyala.PsyBot;
+import com.psyala.Beltip;
 import com.psyala.commands.base.ParameterCommand;
 import com.psyala.pojo.Character;
 import com.psyala.pojo.*;
@@ -31,7 +31,7 @@ public class KeystoneRegister extends ParameterCommand {
                 String dungeonAcronym = parameters.get(1);
                 int dungeonLevel = Integer.parseInt(parameters.get(2));
 
-                Server server = PsyBot.guildController.getGuildStorageObject(guild, new Server());
+                Server server = Beltip.guildController.getGuildStorageObject(guild, new Server());
                 server.guildId = guild.getIdLong();
 
                 Optional<Player> playerO = server.playerList.stream()
@@ -46,7 +46,7 @@ public class KeystoneRegister extends ParameterCommand {
                     keystone.level = dungeonLevel;
                     character.currentKeystone = keystone;
 
-                    PsyBot.guildController.updateGuildStorageObject(guild, server);
+                    Beltip.guildController.updateGuildStorageObject(guild, server);
                 } else {
                     responseMessage = "Could not find player for character: " + characterName;
                 }
@@ -61,9 +61,9 @@ public class KeystoneRegister extends ParameterCommand {
 
         if (!responseMessage.isEmpty())
             channel.sendMessageEmbeds(
-                            MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
-                    )
-                    .delay(PsyBot.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
+                    MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
+            )
+                    .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
                     .queue();
     }

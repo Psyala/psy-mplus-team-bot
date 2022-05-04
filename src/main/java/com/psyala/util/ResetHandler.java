@@ -1,6 +1,6 @@
 package com.psyala.util;
 
-import com.psyala.PsyBot;
+import com.psyala.Beltip;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -37,13 +37,13 @@ public class ResetHandler {
 
     private ZonedDateTime calculateNextReset() {
         LocalDateTime resetDateTime = LocalDateTime.now()
-                .withHour(PsyBot.configuration.resetHourUtc)
+                .withHour(Beltip.configuration.resetHourUtc)
                 .withMinute(0)
                 .withSecond(0)
                 .withNano(0);
 
         DayOfWeek dayOfWeek = resetDateTime.getDayOfWeek();
-        DayOfWeek resetDay = DayOfWeek.valueOf(PsyBot.configuration.resetDay.toUpperCase());
+        DayOfWeek resetDay = DayOfWeek.valueOf(Beltip.configuration.resetDay.toUpperCase());
         int dayDelta = resetDay.getValue() - dayOfWeek.getValue();
 
         if (dayOfWeek.getValue() < resetDay.getValue()) {

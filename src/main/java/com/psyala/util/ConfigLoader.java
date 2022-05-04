@@ -56,19 +56,19 @@ public class ConfigLoader {
                     Integer.parseInt(properties.getProperty(cfg_resetHourUtc, "8")),
                     properties.getProperty(cfg_channelOverview, "current-keys"),
                     serversList,
-                    properties.getProperty(cfg_iconKeystone, "<:keystone:968915657003511828>"),
-                    properties.getProperty(cfg_iconClassPriest, "<:class_priest:968916569579196436>"),
-                    properties.getProperty(cfg_iconClassMage, "<:class_mage:968916569344319568>"),
-                    properties.getProperty(cfg_iconClassWarlock, "<:class_warlock:968916569088471082>"),
-                    properties.getProperty(cfg_iconClassDemonHunter, "<:class_demon_hunter:968916568979411005>"),
-                    properties.getProperty(cfg_iconClassRogue, "<:class_rogue:968924695946739762>"),
-                    properties.getProperty(cfg_iconClassMonk, "<:class_monk:968916569503719424>"),
-                    properties.getProperty(cfg_iconClassDruid, "<:class_druid:968916569520504902>"),
-                    properties.getProperty(cfg_iconClassHunter, "<:class_hunter:968916569419833416>"),
-                    properties.getProperty(cfg_iconClassShaman, "<:class_shaman:968916569562415115>"),
-                    properties.getProperty(cfg_iconClassWarrior, "<:class_warrior:968916569621160086>"),
-                    properties.getProperty(cfg_iconClassDeathKnight, "<:class_death_knight:968916568950075423>"),
-                    properties.getProperty(cfg_iconClassPaladin, "<:class_paladin:968916569331744828>")
+                    properties.getProperty(cfg_iconKeystone, "<:keystone:971537147284832276> "),
+                    properties.getProperty(cfg_iconClassPriest, "<:class_priest:971537147020607528>"),
+                    properties.getProperty(cfg_iconClassMage, "<:class_mage:971537147079323689> "),
+                    properties.getProperty(cfg_iconClassWarlock, "<:class_warlock:971537146949288006> "),
+                    properties.getProperty(cfg_iconClassDemonHunter, "<:class_demon_hunter:971537146806665236> "),
+                    properties.getProperty(cfg_iconClassRogue, "<:class_rogue:971537146768949299>"),
+                    properties.getProperty(cfg_iconClassMonk, "<:class_monk:971537146928320582>"),
+                    properties.getProperty(cfg_iconClassDruid, "<:class_druid:971537147037376512> "),
+                    properties.getProperty(cfg_iconClassHunter, "<:class_hunter:971537146978656306> "),
+                    properties.getProperty(cfg_iconClassShaman, "<:class_shaman:971537146966073394>"),
+                    properties.getProperty(cfg_iconClassWarrior, "<:class_warrior:971537146626338867>"),
+                    properties.getProperty(cfg_iconClassDeathKnight, "<:class_death_knight:971537146907336704> "),
+                    properties.getProperty(cfg_iconClassPaladin, "<:class_paladin:971537146974457977>")
             ));
         } catch (Exception ex) {
             LOGGER.error("Error loading configuration file", ex);

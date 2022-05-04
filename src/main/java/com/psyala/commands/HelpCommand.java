@@ -1,6 +1,6 @@
 package com.psyala.commands;
 
-import com.psyala.PsyBot;
+import com.psyala.Beltip;
 import com.psyala.commands.base.Command;
 import com.psyala.commands.base.SimpleCommand;
 import com.psyala.pojo.Dungeon;
@@ -61,7 +61,7 @@ public class HelpCommand extends SimpleCommand {
                                     "Could not whisper you ".concat(author.getAsMention()) + " check your privacy settings!"
                             )
                     )
-                            .delay(PsyBot.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
+                            .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                             .flatMap(Message::delete)
                             .queue();
                 });

@@ -1,6 +1,6 @@
 package com.psyala.listeners;
 
-import com.psyala.PsyBot;
+import com.psyala.Beltip;
 import com.psyala.commands.*;
 import com.psyala.commands.base.Command;
 import com.psyala.commands.base.ParameterCommand;
@@ -71,7 +71,7 @@ public class MessageListener extends ListenerAdapter {
                         LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
                     }
                     if (splitMessage.startsWith("!" + command.getCommand()) && command instanceof ParameterCommand) {
-                        List<String> parameters = List.of(splitMessage.replace("!" + command.getCommand(), "").split(" "));
+                        List<String> parameters = Arrays.asList(splitMessage.replace("!" + command.getCommand(), "").split(" "));
                         ((ParameterCommand) command).handle(guild, author, channel, parameters.stream().filter(s -> !s.isEmpty()).collect(Collectors.toList()));
                         messageDeleted.set(true);
                         commandActioned.set(true);
@@ -81,7 +81,7 @@ public class MessageListener extends ListenerAdapter {
                 });
 
                 //Delete incoming message if in moderated channel
-                if (Arrays.asList(PsyBot.configuration.channelOverviewName)
+                if (Arrays.asList(Beltip.configuration.channelOverviewName)
                         .contains(textChannel.getName()) && !messageDeleted.get()) {
                     DiscordInteractions.deleteMessage(message);
                 }

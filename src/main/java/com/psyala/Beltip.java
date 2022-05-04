@@ -17,8 +17,8 @@ import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class PsyBot {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PsyBot.class);
+public class Beltip {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Beltip.class);
     private static final Timer resetTimer = new Timer("Reset Timer");
     private static JDA discordBot;
 
@@ -28,10 +28,13 @@ public class PsyBot {
 
     public static void main(String[] args) {
         try {
+            LOGGER.info("Starting up...");
+            
             ConfigLoader configLoader = new ConfigLoader();
             Optional<Configuration> config = configLoader.loadConfiguration();
-            if (config.isEmpty()) return;
+            if (!config.isPresent()) return;
             configuration = config.get();
+            LOGGER.info("Loaded configuration");
 
             discordBot = JDABuilder.createLight(config.get().botToken)
                     .setActivity(Activity.listening("your commands"))

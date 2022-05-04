@@ -1,6 +1,6 @@
 package com.psyala.pojo.characterists;
 
-import com.psyala.PsyBot;
+import com.psyala.Beltip;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,29 +40,29 @@ public enum CharacterClass {
     public String getClassIcon() {
         switch (this) {
             case PRIEST:
-                return PsyBot.configuration.iconClassPriest;
+                return Beltip.configuration.iconClassPriest;
             case MAGE:
-                return PsyBot.configuration.iconClassMage;
+                return Beltip.configuration.iconClassMage;
             case WARLOCK:
-                return PsyBot.configuration.iconClassWarlock;
+                return Beltip.configuration.iconClassWarlock;
             case DEMON_HUNTER:
-                return PsyBot.configuration.iconClassDemonHunter;
+                return Beltip.configuration.iconClassDemonHunter;
             case ROGUE:
-                return PsyBot.configuration.iconClassRogue;
+                return Beltip.configuration.iconClassRogue;
             case MONK:
-                return PsyBot.configuration.iconClassMonk;
+                return Beltip.configuration.iconClassMonk;
             case DRUID:
-                return PsyBot.configuration.iconClassDruid;
+                return Beltip.configuration.iconClassDruid;
             case HUNTER:
-                return PsyBot.configuration.iconClassHunter;
+                return Beltip.configuration.iconClassHunter;
             case SHAMAN:
-                return PsyBot.configuration.iconClassShaman;
+                return Beltip.configuration.iconClassShaman;
             case WARRIOR:
-                return PsyBot.configuration.iconClassWarrior;
+                return Beltip.configuration.iconClassWarrior;
             case DEATH_KNIGHT:
-                return PsyBot.configuration.iconClassDeathKnight;
+                return Beltip.configuration.iconClassDeathKnight;
             case PALADIN:
-                return PsyBot.configuration.iconClassPaladin;
+                return Beltip.configuration.iconClassPaladin;
             default:
                 return ":question:";
         }
