@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.internal.entities.TextChannelImpl;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,10 +75,10 @@ public class GuildController {
             if (guild.getSystemChannel() != null)
                 guild.getSystemChannel()
                         .sendMessageEmbeds(MessageFormatting.createTextualEmbedMessage(
-                                "Server not configured correctly",
-                                "This bot requires the following text channels to be present:\r\n"
-                                        + String.join(", ", Beltip.configuration.channelOverviewName)
-                                        + "\r\n\r\nOnce this has been done, run the initialise command."
+                                        "Server not configured correctly",
+                                        "This bot requires the following text channels to be present:\r\n"
+                                                + String.join(", ", Beltip.configuration.channelOverviewName)
+                                                + "\r\n\r\nOnce this has been done, run the initialise command."
                                 )
                         )
                         .queue();
@@ -110,22 +109,9 @@ public class GuildController {
                     List<String> characterOutput = new ArrayList<>();
                     player.characterList.stream().sorted(Comparator.comparing(o -> o.name)).forEach(character -> {
                         StringBuilder charBuilder = new StringBuilder()
-                                .append(character.characterClass.getClassIcon())
-                                .append(" `")
-                                .append(StringUtils.rightPad(character.name, 25, " "))
-                                .append("` ")
-                                .append(Beltip.configuration.iconKeystone);
-
-                        if (character.currentKeystone == null) {
-                            charBuilder.append(" `")
-                                    .append(StringUtils.rightPad("None", 10, " "))
-                                    .append("`");
-                        } else {
-                            charBuilder.append(" `")
-                                    .append(StringUtils.rightPad(character.currentKeystone.dungeon.getAcronym(), 8, " "))
-                                    .append(StringUtils.leftPad(String.valueOf(character.currentKeystone.level), 2, " "))
-                                    .append("`");
-                        }
+                                .append(MessageFormatting.formatCharacter(character))
+                                .append(" ")
+                                .append(MessageFormatting.formatKeystone(character.currentKeystone));
 
                         characterOutput.add(charBuilder.toString());
                     });
@@ -161,7 +147,9 @@ public class GuildController {
         return guildOverviewChannelMap.get(guild);
     }
 
-    public Server getGuildStorageObject(Guild guild, Server defaultValue) {
+    public Server getGuildStorageObject(Guild guild) {
+        Server defaultValue = new Server();
+        defaultValue.guildId = guild.getIdLong();
         return guildStorageMap.getOrDefault(guild, defaultValue);
     }
 

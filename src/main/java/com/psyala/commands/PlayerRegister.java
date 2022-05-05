@@ -29,8 +29,7 @@ public class PlayerRegister extends ParameterCommand {
             if (playerName.trim().isEmpty()) {
                 responseMessage = "No player name specified";
             } else {
-                Server server = Beltip.guildController.getGuildStorageObject(guild, new Server());
-                server.guildId = guild.getIdLong();
+                Server server = Beltip.guildController.getGuildStorageObject(guild);
 
                 if (server.playerList.stream().anyMatch(player -> player.name.equalsIgnoreCase(playerName))) {
                     responseMessage = "Player already exists: " + playerName;
@@ -45,8 +44,8 @@ public class PlayerRegister extends ParameterCommand {
 
         if (!responseMessage.isEmpty())
             channel.sendMessageEmbeds(
-                    MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
-            )
+                            MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
+                    )
                     .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
                     .queue();

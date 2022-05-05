@@ -29,8 +29,7 @@ public class CharacterDelist extends ParameterCommand {
             try {
                 String characterName = parameters.get(0);
 
-                Server server = Beltip.guildController.getGuildStorageObject(guild, new Server());
-                server.guildId = guild.getIdLong();
+                Server server = Beltip.guildController.getGuildStorageObject(guild);
 
                 Optional<Player> playerO = server.playerList.stream()
                         .filter(player -> player.characterList
@@ -52,8 +51,8 @@ public class CharacterDelist extends ParameterCommand {
 
         if (!responseMessage.isEmpty())
             channel.sendMessageEmbeds(
-                    MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
-            )
+                            MessageFormatting.createTextualEmbedMessage("Delist Character Response", responseMessage)
+                    )
                     .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
                     .queue();

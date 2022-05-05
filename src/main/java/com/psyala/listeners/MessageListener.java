@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class MessageListener extends ListenerAdapter {
+    public static final String COMMAND_CHAR = "!";
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageListener.class);
     private final List<Command> commandList = new ArrayList<>();
 
@@ -63,14 +64,14 @@ public class MessageListener extends ListenerAdapter {
             messages.forEach(splitMessage -> {
                 AtomicBoolean messageDeleted = new AtomicBoolean(false);
                 commandList.forEach(command -> {
-                    if (splitMessage.equals("!" + command.getCommand()) && command instanceof SimpleCommand) {
+                    if (splitMessage.equals(COMMAND_CHAR + command.getCommand()) && command instanceof SimpleCommand) {
                         ((SimpleCommand) command).handle(guild, author, channel);
                         messageDeleted.set(true);
                         commandActioned.set(true);
                         if (!batch) DiscordInteractions.deleteMessage(message);
                         LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
                     }
-                    if (splitMessage.startsWith("!" + command.getCommand()) && command instanceof ParameterCommand) {
+                    if (splitMessage.startsWith(COMMAND_CHAR + command.getCommand()) && command instanceof ParameterCommand) {
                         List<String> parameters = Arrays.asList(splitMessage.replace("!" + command.getCommand(), "").split(" "));
                         ((ParameterCommand) command).handle(guild, author, channel, parameters.stream().filter(s -> !s.isEmpty()).collect(Collectors.toList()));
                         messageDeleted.set(true);

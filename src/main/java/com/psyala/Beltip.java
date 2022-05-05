@@ -23,13 +23,14 @@ public class Beltip {
     private static JDA discordBot;
 
     public static int MESSAGE_DELETE_TIME = 10;
+    public static int MESSAGE_IMPORTANT_DELETE_TIME = 30;
     public static Configuration configuration;
     public static GuildController guildController;
 
     public static void main(String[] args) {
         try {
             LOGGER.info("Starting up...");
-            
+
             ConfigLoader configLoader = new ConfigLoader();
             Optional<Configuration> config = configLoader.loadConfiguration();
             if (!config.isPresent()) return;
@@ -65,10 +66,7 @@ public class Beltip {
                     boolean hasResetHappened = ResetHandler.getInstance().hasResetHappened();
                     if (hasResetHappened) {
                         guildController.getValidGuilds().forEach(guild -> {
-                            Server defaultServer = new Server();
-                            defaultServer.guildId = guild.getIdLong();
-
-                            Server dataObject = guildController.getGuildStorageObject(guild, defaultServer);
+                            Server dataObject = guildController.getGuildStorageObject(guild);
 
                             dataObject.playerList.forEach(player -> {
                                 player.characterList.forEach(character -> character.currentKeystone = null);

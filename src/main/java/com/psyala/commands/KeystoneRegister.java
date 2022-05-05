@@ -31,8 +31,7 @@ public class KeystoneRegister extends ParameterCommand {
                 String dungeonAcronym = parameters.get(1);
                 int dungeonLevel = Integer.parseInt(parameters.get(2));
 
-                Server server = Beltip.guildController.getGuildStorageObject(guild, new Server());
-                server.guildId = guild.getIdLong();
+                Server server = Beltip.guildController.getGuildStorageObject(guild);
 
                 Optional<Player> playerO = server.playerList.stream()
                         .filter(player -> player.containsCharacter(characterName))
@@ -61,8 +60,8 @@ public class KeystoneRegister extends ParameterCommand {
 
         if (!responseMessage.isEmpty())
             channel.sendMessageEmbeds(
-                    MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
-            )
+                            MessageFormatting.createTextualEmbedMessage("Keystone Register Response", responseMessage)
+                    )
                     .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
                     .queue();

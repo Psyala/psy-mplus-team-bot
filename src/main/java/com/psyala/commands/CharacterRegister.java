@@ -32,8 +32,7 @@ public class CharacterRegister extends ParameterCommand {
                 String characterName = parameters.get(1);
                 String characterClass = parameters.get(2);
 
-                Server server = Beltip.guildController.getGuildStorageObject(guild, new Server());
-                server.guildId = guild.getIdLong();
+                Server server = Beltip.guildController.getGuildStorageObject(guild);
 
                 Optional<Player> playerO = server.playerList.stream().filter(player -> player.name.equalsIgnoreCase(playerName)).findFirst();
                 if (playerO.isPresent()) {
@@ -65,8 +64,8 @@ public class CharacterRegister extends ParameterCommand {
 
         if (!responseMessage.isEmpty())
             channel.sendMessageEmbeds(
-                    MessageFormatting.createTextualEmbedMessage("Register Player Response", responseMessage)
-            )
+                            MessageFormatting.createTextualEmbedMessage("Register Character Response", responseMessage)
+                    )
                     .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
                     .queue();
