@@ -47,6 +47,7 @@ public class Beltip {
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 LOGGER.info("Starting Shutdown");
+                guildController.purge();
                 discordBot.shutdownNow();
                 configuration.saveStateJson = guildController.getServerListJson();
                 configLoader.saveConfiguration(configuration);
