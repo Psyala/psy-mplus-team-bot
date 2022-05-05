@@ -15,4 +15,11 @@ public class Character {
         if (playableRoles == null || playableRoles.isEmpty()) return characterClass.getPossibleRoles();
         return playableRoles;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }

@@ -20,12 +20,16 @@ public class Configuration {
     public final String iconClassWarrior;
     public final String iconClassDeathKnight;
     public final String iconClassPaladin;
+    public final String iconRoleTank;
+    public final String iconRoleHealer;
+    public final String iconRoleDps;
 
     public Configuration(String botToken, String resetDay, Integer resetHourUtc, String channelOverview, ServerList initialLoadServerState,
                          String iconKeystone, String iconClassPriest, String iconClassMage, String iconClassWarlock,
                          String iconClassDemonHunter, String iconClassRogue, String iconClassMonk, String iconClassDruid,
                          String iconClassHunter, String iconClassShaman,
-                         String iconClassWarrior, String iconClassDeathKnight, String iconClassPaladin) {
+                         String iconClassWarrior, String iconClassDeathKnight, String iconClassPaladin,
+                         String iconRoleTank, String iconRoleHealer, String iconRoleDps) {
         this.botToken = botToken;
         this.resetDay = resetDay;
         this.resetHourUtc = resetHourUtc;
@@ -44,5 +48,8 @@ public class Configuration {
         this.iconClassWarrior = iconClassWarrior;
         this.iconClassDeathKnight = iconClassDeathKnight;
         this.iconClassPaladin = iconClassPaladin;
+        this.iconRoleTank = iconRoleTank;
+        this.iconRoleHealer = iconRoleHealer;
+        this.iconRoleDps = iconRoleDps;
     }
 }

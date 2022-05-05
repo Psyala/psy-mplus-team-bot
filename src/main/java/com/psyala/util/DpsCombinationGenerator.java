@@ -5,8 +5,11 @@ import com.psyala.pojo.PlayerCharacterPair;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CombinationGenerator {
-    public static List<List<PlayerCharacterPair>> generate(int n, int r, List<PlayerCharacterPair> playerCharacterPairList) {
+public class DpsCombinationGenerator {
+    public static List<List<PlayerCharacterPair>> generate(List<PlayerCharacterPair> dpsPlayerCharacters) {
+        int n = dpsPlayerCharacters.size();
+        int r = 2;
+
         List<int[]> indexCombinations = new ArrayList<>();
         helper(indexCombinations, new int[r], 0, n - 1, 0);
 
@@ -14,10 +17,17 @@ public class CombinationGenerator {
         indexCombinations.forEach(ints -> {
             List<PlayerCharacterPair> combination = new ArrayList<>();
             for (int i : ints) {
-                combination.add(playerCharacterPairList.get(i));
+                combination.add(dpsPlayerCharacters.get(i));
             }
             returnList.add(combination);
         });
+
+        returnList.removeIf(
+                dpsList -> dpsList.stream()
+                        .map(dps -> dps.getPlayer().name)
+                        .distinct()
+                        .count() < r
+        );
 
         return returnList;
     }

@@ -32,6 +32,9 @@ public class ConfigLoader {
     private static final String cfg_iconClassWarrior = "cfg.iconClassWarrior";
     private static final String cfg_iconClassDeathKnight = "cfg.iconClassDeathKnight";
     private static final String cfg_iconClassPaladin = "cfg.iconClassPaladin";
+    private static final String cfg_iconRoleTank = "cfg.iconRoleTank";
+    private static final String cfg_iconRoleHealer = "cfg.iconRoleHealer";
+    private static final String cfg_iconRoleDps = "cfg.iconRoleDps";
 
     private static final String data_serversState = "data.serversState";
 
@@ -68,7 +71,10 @@ public class ConfigLoader {
                     properties.getProperty(cfg_iconClassShaman, "<:class_shaman:971537146966073394>"),
                     properties.getProperty(cfg_iconClassWarrior, "<:class_warrior:971537146626338867>"),
                     properties.getProperty(cfg_iconClassDeathKnight, "<:class_death_knight:971537146907336704> "),
-                    properties.getProperty(cfg_iconClassPaladin, "<:class_paladin:971537146974457977>")
+                    properties.getProperty(cfg_iconClassPaladin, "<:class_paladin:971537146974457977>"),
+                    properties.getProperty(cfg_iconRoleTank, "<:role_tank:971821578230849576>"),
+                    properties.getProperty(cfg_iconRoleHealer, "<:role_healer:971821577945624656>"),
+                    properties.getProperty(cfg_iconRoleDps, "<:role_dps:971821578021138473>")
             ));
         } catch (Exception ex) {
             LOGGER.error("Error loading configuration file", ex);
@@ -97,6 +103,9 @@ public class ConfigLoader {
             properties.setProperty(cfg_iconClassWarrior, configuration.iconClassWarrior);
             properties.setProperty(cfg_iconClassDeathKnight, configuration.iconClassDeathKnight);
             properties.setProperty(cfg_iconClassPaladin, configuration.iconClassPaladin);
+            properties.setProperty(cfg_iconRoleTank, configuration.iconRoleTank);
+            properties.setProperty(cfg_iconRoleHealer, configuration.iconRoleHealer);
+            properties.setProperty(cfg_iconRoleDps, configuration.iconRoleDps);
 
             properties.store(stream, "Comments");
             LOGGER.info("Saved configuration to file.");

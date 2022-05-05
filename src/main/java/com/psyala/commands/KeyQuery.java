@@ -8,7 +8,7 @@ import com.psyala.pojo.*;
 import com.psyala.pojo.characterists.ArmourClass;
 import com.psyala.pojo.characterists.Role;
 import com.psyala.pojo.characterists.TrinketClass;
-import com.psyala.util.CombinationGenerator;
+import com.psyala.util.DpsCombinationGenerator;
 import com.psyala.util.MessageFormatting;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -17,7 +17,9 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -29,6 +31,7 @@ public class KeyQuery extends ParameterCommand {
     @Override
     public void handle(Guild guild, User author, MessageChannel channel, List<String> parameters) {
         String initialRequest = author.getAsMention() + " - " + MessageListener.COMMAND_CHAR + getCommand() + " " + String.join(" ", parameters);
+        String formattedRequest = "";
         String responseMessage = "";
         EmbedBuilder embedBuilder = new EmbedBuilder();
 
@@ -58,14 +61,21 @@ public class KeyQuery extends ParameterCommand {
                 requestedKeystone.level = dungeonLevel;
                 boolean stackRequired = armourClass != null || trinketClass != null;
 
+                formattedRequest = "**Dungeon:** " + requestedKeystone.dungeon.name() + "\r\n" +
+                        "**Level:** " + requestedKeystone.level + "\r\n" +
+                        "**Stack?** " + (stackRequired ? "Yes" : "No") + "\r\n" +
+                        (stackRequired ? "**Stack Type:** " + (armourClass != null ? "Armour - " + armourClass.name() : "Trinket - " + trinketClass.name()) : "");
+
                 List<KeystoneGroup> keystoneGroups = getKeystoneGroups(server, requestedKeystone, armourClass, trinketClass);
                 if (keystoneGroups.isEmpty()) {
-                    responseMessage = "No suitable group configuration found";
+                    responseMessage = ":no_entry: **No suitable group configuration found** :no_entry:";
                 } else {
-                    responseMessage = ":bangbang: **Suitable group has been found** :bangbang:\r\n\r\n**Possible Groups:**";
+                    responseMessage = ":white_check_mark: **One or more suitable groups have been found** :white_check_mark:\r\n\r\n**Possible Groups (" + keystoneGroups.size() + "):**";
                     AtomicInteger i = new AtomicInteger();
+                    AtomicInteger rowCount = new AtomicInteger();
                     keystoneGroups.stream()
                             .sorted((o1, o2) -> Integer.compare(o2.getNumberOfStackRequirementMet(), o1.getNumberOfStackRequirementMet()))
+                            .limit(10)
                             .forEach(keystoneGroup -> {
                                 StringBuilder groupComp = new StringBuilder();
                                 groupComp.append(outputCharacter(keystoneGroup.getTank(), Role.TANK, keystoneGroup.getTank().name.equalsIgnoreCase(keystoneGroup.getKeystoneHolder().name))).append("\r\n");
@@ -74,11 +84,17 @@ public class KeyQuery extends ParameterCommand {
                                     groupComp.append(outputCharacter(dps, Role.DPS, dps.name.equalsIgnoreCase(keystoneGroup.getKeystoneHolder().name))).append("\r\n");
                                 });
 
+                                if (rowCount.get() == 2) {
+                                    rowCount.set(0);
+                                    embedBuilder.addBlankField(false);
+                                }
+
                                 embedBuilder.addField(
                                         "Group " + i.incrementAndGet() + (stackRequired ? " | Stack Requirements Met: " + keystoneGroup.getNumberOfStackRequirementMet() : ""),
                                         groupComp.toString(),
-                                        false
+                                        true
                                 );
+                                rowCount.getAndIncrement();
                             });
                 }
             } catch (IndexOutOfBoundsException ex) {
@@ -92,7 +108,10 @@ public class KeyQuery extends ParameterCommand {
 
         MessageEmbed messageEmbed = embedBuilder
                 .setTitle("Keystone Query Response")
-                .setDescription(initialRequest + "\r\n\r\n" + responseMessage)
+                .setDescription("**Command:** " + initialRequest + "\r\n\r\n" +
+                        (formattedRequest.isEmpty() ? "" : formattedRequest + "\r\n\r\n") +
+                        responseMessage
+                )
                 .setColor(MessageFormatting.EMBED_COLOUR)
                 .build();
         channel.sendMessageEmbeds(messageEmbed)
@@ -100,12 +119,13 @@ public class KeyQuery extends ParameterCommand {
     }
 
     private String outputCharacter(Character character, Role role, boolean keystoneHolder) {
-        return MessageFormatting.formatCharacter(character) + " " + role.name() + " " + (keystoneHolder ? Beltip.configuration.iconKeystone : "");
+        return MessageFormatting.formatCharacter(character) + " " + role.getRoleIcon() + " " + (keystoneHolder ? Beltip.configuration.iconKeystone : "");
     }
 
-    private List<KeystoneGroup> getKeystoneGroups(Server server, Keystone requestedKeystone, ArmourClass armourClass, TrinketClass trinketClass) {
+    protected List<KeystoneGroup> getKeystoneGroups(Server server, Keystone requestedKeystone, ArmourClass armourClass, TrinketClass trinketClass) {
         List<PlayerCharacterPair> possibleKeyHolders = findPossibleKeyHolders(server, requestedKeystone);
 
+        //Get all possible combinations
         List<KeystoneGroup> foundKeystoneGroups = new ArrayList<>();
         possibleKeyHolders.forEach(keyholder -> {
             List<Player> otherPlayers = server.playerList.stream()
@@ -119,7 +139,23 @@ public class KeyQuery extends ParameterCommand {
             foundKeystoneGroups.addAll(possibleComps);
         });
 
-        return foundKeystoneGroups;
+        //Remove combinations which have the same comp, but different key holder ?
+        Map<String, KeystoneGroup> foundUniqueKeystoneGroups = new HashMap<>();
+        foundKeystoneGroups.forEach(keystoneGroup -> {
+            String stringifyComp = "" +
+                    "tank=" + keystoneGroup.getTank().name + "," +
+                    "heal=" + keystoneGroup.getHealer().name + "," +
+                    "dps1=" + keystoneGroup.getDps().get(0).name + "," +
+                    "dps2=" + keystoneGroup.getDps().get(1).name;
+
+            if (!foundUniqueKeystoneGroups.containsKey(stringifyComp)) {
+                {
+                    foundUniqueKeystoneGroups.put(stringifyComp, keystoneGroup);
+                }
+            }
+        });
+
+        return new ArrayList<>(foundUniqueKeystoneGroups.values());
     }
 
     private List<KeystoneGroup> getPossibleGroupComps(Keystone keystone, PlayerCharacterPair keystoneHolder, List<Player> otherPlayers, ArmourClass armourClass, TrinketClass trinketClass) {
@@ -138,8 +174,8 @@ public class KeyQuery extends ParameterCommand {
                         .filter(dps -> !dps.getPlayer().name.equals(tank.getPlayer().name) && !dps.getPlayer().name.equals(healer.getPlayer().name))
                         .collect(Collectors.toList());
 
-                if (filteredDps.size() >= 3) {
-                    List<List<PlayerCharacterPair>> dpsCombinations = CombinationGenerator.generate(filteredDps.size(), 3, filteredDps);
+                if (filteredDps.size() >= 2) {
+                    List<List<PlayerCharacterPair>> dpsCombinations = DpsCombinationGenerator.generate(filteredDps);
                     dpsCombinations.forEach(dpsCombination -> {
                         int stackRequirementsMet = 0;
                         if (doesCharacterFitStackRequirement(tank.getCharacter(), armourClass, trinketClass))
@@ -206,12 +242,5 @@ public class KeyQuery extends ParameterCommand {
         });
 
         return possibleKeyHolders;
-    }
-
-    public int factorial(int n) {
-        if (n == 0)
-            return 1;
-        else
-            return (n * factorial(n - 1));
     }
 }

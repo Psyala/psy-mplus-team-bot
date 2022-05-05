@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +41,10 @@ public class MessageFormatting {
     }
 
     public static String formatRoles(List<Role> roleList) {
-        return roleList.stream().map(Enum::name).collect(Collectors.joining(" "));
+        return roleList.stream()
+                .sorted(Comparator.comparingInt(Role::getI))
+                .map(Role::getRoleIcon)
+                .collect(Collectors.joining(" "));
     }
 
     public static String formatKeystone(Keystone keystone) {

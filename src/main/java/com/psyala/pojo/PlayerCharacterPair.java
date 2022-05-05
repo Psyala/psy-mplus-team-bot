@@ -16,4 +16,12 @@ public class PlayerCharacterPair {
     public Character getCharacter() {
         return character;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "player=" + player.name +
+                ", character=" + character.name +
+                '}';
+    }
 }
