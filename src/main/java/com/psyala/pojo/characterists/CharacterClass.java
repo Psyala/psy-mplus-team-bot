@@ -23,10 +23,12 @@ public enum CharacterClass {
 
     private final ArmourClass armourClass;
     private final List<TrinketClass> trinketClassList;
+    private final List<Role> possibleRoles;
 
     CharacterClass(ArmourClass armourClass, List<TrinketClass> trinketClassList, List<Role> possibleRoles) {
         this.armourClass = armourClass;
         this.trinketClassList = trinketClassList;
+        this.possibleRoles = possibleRoles;
     }
 
     public ArmourClass getArmourClass() {
@@ -35,6 +37,10 @@ public enum CharacterClass {
 
     public List<TrinketClass> getTrinketClassList() {
         return trinketClassList;
+    }
+
+    public List<Role> getPossibleRoles() {
+        return possibleRoles;
     }
 
     public String getClassIcon() {

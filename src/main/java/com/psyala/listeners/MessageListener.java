@@ -33,6 +33,7 @@ public class MessageListener extends ListenerAdapter {
         commandList.add(new CharacterRegister());
         commandList.add(new CharacterDelist());
         commandList.add(new KeystoneRegister());
+        commandList.add(new KeyQuery());
     }
 
     @Override

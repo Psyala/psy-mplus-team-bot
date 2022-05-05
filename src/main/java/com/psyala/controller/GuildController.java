@@ -111,6 +111,8 @@ public class GuildController {
                         StringBuilder charBuilder = new StringBuilder()
                                 .append(MessageFormatting.formatCharacter(character))
                                 .append(" ")
+                                .append(MessageFormatting.formatRoles(character.getPlayableRoles()))
+                                .append(" ")
                                 .append(MessageFormatting.formatKeystone(character.currentKeystone));
 
                         characterOutput.add(charBuilder.toString());
