@@ -23,13 +23,14 @@ public class Configuration {
     public final String iconRoleTank;
     public final String iconRoleHealer;
     public final String iconRoleDps;
+    public final String iconRoleBlank;
 
     public Configuration(String botToken, String resetDay, Integer resetHourUtc, String channelOverview, ServerList initialLoadServerState,
                          String iconKeystone, String iconClassPriest, String iconClassMage, String iconClassWarlock,
                          String iconClassDemonHunter, String iconClassRogue, String iconClassMonk, String iconClassDruid,
                          String iconClassHunter, String iconClassShaman,
                          String iconClassWarrior, String iconClassDeathKnight, String iconClassPaladin,
-                         String iconRoleTank, String iconRoleHealer, String iconRoleDps) {
+                         String iconRoleTank, String iconRoleHealer, String iconRoleDps, String iconRoleBlank) {
         this.botToken = botToken;
         this.resetDay = resetDay;
         this.resetHourUtc = resetHourUtc;
@@ -51,5 +52,6 @@ public class Configuration {
         this.iconRoleTank = iconRoleTank;
         this.iconRoleHealer = iconRoleHealer;
         this.iconRoleDps = iconRoleDps;
+        this.iconRoleBlank = iconRoleBlank;
     }
 }

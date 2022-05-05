@@ -35,6 +35,7 @@ public class ConfigLoader {
     private static final String cfg_iconRoleTank = "cfg.iconRoleTank";
     private static final String cfg_iconRoleHealer = "cfg.iconRoleHealer";
     private static final String cfg_iconRoleDps = "cfg.iconRoleDps";
+    private static final String cfg_iconRoleBlank = "cfg.iconRoleBlank";
 
     private static final String data_serversState = "data.serversState";
 
@@ -74,7 +75,8 @@ public class ConfigLoader {
                     properties.getProperty(cfg_iconClassPaladin, "<:class_paladin:971537146974457977>"),
                     properties.getProperty(cfg_iconRoleTank, "<:role_tank:971821578230849576>"),
                     properties.getProperty(cfg_iconRoleHealer, "<:role_healer:971821577945624656>"),
-                    properties.getProperty(cfg_iconRoleDps, "<:role_dps:971821578021138473>")
+                    properties.getProperty(cfg_iconRoleDps, "<:role_dps:971821578021138473>"),
+                    properties.getProperty(cfg_iconRoleBlank, "<:role_blank:971898967111634984>")
             ));
         } catch (Exception ex) {
             LOGGER.error("Error loading configuration file", ex);
@@ -106,6 +108,7 @@ public class ConfigLoader {
             properties.setProperty(cfg_iconRoleTank, configuration.iconRoleTank);
             properties.setProperty(cfg_iconRoleHealer, configuration.iconRoleHealer);
             properties.setProperty(cfg_iconRoleDps, configuration.iconRoleDps);
+            properties.setProperty(cfg_iconRoleBlank, configuration.iconRoleBlank);
 
             properties.store(stream, "Comments");
             LOGGER.info("Saved configuration to file.");

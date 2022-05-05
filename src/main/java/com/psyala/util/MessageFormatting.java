@@ -40,11 +40,22 @@ public class MessageFormatting {
         return character.characterClass.getClassIcon() + " `" + StringUtils.rightPad(character.name, 25, " ") + "`";
     }
 
-    public static String formatRoles(List<Role> roleList) {
-        return roleList.stream()
+    public static String formatRoles(List<Role> roleList, boolean fillBlanks) {
+        List<String> outputIcons = roleList.stream()
                 .sorted(Comparator.comparingInt(Role::getI))
                 .map(Role::getRoleIcon)
-                .collect(Collectors.joining(" "));
+                .collect(Collectors.toList());
+
+        int roleDelta = Role.values().length - outputIcons.size();
+        if (roleDelta != 0 && fillBlanks) {
+            for (int i = 0; i < roleDelta; i++) {
+                outputIcons.add(Beltip.configuration.iconRoleBlank);
+            }
+        }
+
+        outputIcons.add(Beltip.configuration.iconRoleBlank);
+
+        return String.join(" ", outputIcons);
     }
 
     public static String formatKeystone(Keystone keystone) {
