@@ -1,4 +1,4 @@
-# Beltip
+# psy-mplus-team-bot aka Beltip
 
 An application which connects to the Discord API to enact as a bot; receiving commands and acting upon them.
 
