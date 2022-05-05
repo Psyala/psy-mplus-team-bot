@@ -3,7 +3,6 @@ package com.psyala.util;
 import com.psyala.Beltip;
 
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,28 +34,37 @@ public class ResetHandler {
         return false;
     }
 
-    private ZonedDateTime calculateNextReset() {
-        LocalDateTime resetDateTime = LocalDateTime.now()
-                .withHour(Beltip.configuration.resetHourUtc)
+    protected ZonedDateTime calculateNextReset() {
+        return calculateNextReset(ZonedDateTime.now(), Beltip.configuration.resetHourUtc, Beltip.configuration.resetDay.toUpperCase());
+    }
+
+    protected static ZonedDateTime calculateNextReset(ZonedDateTime now, int resetHourUtc, String resetDayOfWeek) {
+        ZonedDateTime resetDateTime = now
+                .withZoneSameInstant(ZoneId.of("UTC"))
+                .withHour(resetHourUtc)
                 .withMinute(0)
                 .withSecond(0)
                 .withNano(0);
 
-        DayOfWeek dayOfWeek = resetDateTime.getDayOfWeek();
-        DayOfWeek resetDay = DayOfWeek.valueOf(Beltip.configuration.resetDay.toUpperCase());
-        int dayDelta = resetDay.getValue() - dayOfWeek.getValue();
+        DayOfWeek currentDayOfWeek = resetDateTime.getDayOfWeek();
+        DayOfWeek resetDay = DayOfWeek.valueOf(resetDayOfWeek);
+        int dayDelta = Math.abs(currentDayOfWeek.getValue() - resetDay.getValue());
 
-        if (dayOfWeek.getValue() < resetDay.getValue()) {
-            return resetDateTime.plusDays(dayDelta).atZone(ZoneId.systemDefault());
-        } else if (dayOfWeek.getValue() > resetDay.getValue()) {
+        //Current day is smaller than reset day, thus is before - so add the difference
+        if (currentDayOfWeek.getValue() < resetDay.getValue()) {
+            return resetDateTime.plusDays(dayDelta);
+        }
+        //Current day is larger than reset day, thus is after - so minus the difference and add a week
+        else if (currentDayOfWeek.getValue() > resetDay.getValue()) {
             return resetDateTime
                     .minusDays(dayDelta)
-                    .plusWeeks(1)
-                    .atZone(ZoneId.systemDefault());
-        } else {
-            return LocalDateTime.now().isBefore(resetDateTime) ?
-                    resetDateTime.atZone(ZoneId.systemDefault())
-                    : resetDateTime.plusWeeks(1).atZone(ZoneId.systemDefault());
+                    .plusWeeks(1);
+        }
+        //Else it's the same day - so check if now is before the reset time - if it is then add a week
+        else {
+            return now.isBefore(resetDateTime) ?
+                    resetDateTime
+                    : resetDateTime.plusWeeks(1);
         }
     }
 }

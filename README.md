@@ -7,6 +7,5 @@ roster.
 
 ### Remaining Tasks to Implement:
 
-* Reset day isn't calculated properly, it's taken from 8 in the morning of the timezone of the computer
 * Implement role selection for characters
 * Display affixes
