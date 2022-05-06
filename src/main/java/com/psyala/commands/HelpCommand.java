@@ -34,7 +34,9 @@ public class HelpCommand extends SimpleCommand {
 
     @Override
     public void handle(Guild guild, User author, MessageChannel channel) {
-        String information = "Commands are prefixed with the character: `" + MessageListener.COMMAND_CHAR + "`";
+        String information = "" +
+                "Beltip Version: " + Beltip.version + "\r\n" +
+                "Commands are prefixed with the character: `" + MessageListener.COMMAND_CHAR + "`";
 
         String commands = "**Commands**" +
                 "\r\n```" +

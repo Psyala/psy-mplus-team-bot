@@ -26,16 +26,24 @@ public class Beltip {
     public static int MESSAGE_IMPORTANT_DELETE_TIME = 30;
     public static Configuration configuration;
     public static GuildController guildController;
+    public static String version;
 
     public static void main(String[] args) {
         try {
             LOGGER.info("Starting up...");
+            version = Beltip.class.getPackage().getImplementationVersion() == null ? "DEV" : Beltip.class.getPackage().getImplementationVersion();
+            LOGGER.info("Version - " + version);
 
             ConfigLoader configLoader = new ConfigLoader();
             Optional<Configuration> config = configLoader.loadConfiguration();
             if (!config.isPresent()) return;
             configuration = config.get();
             LOGGER.info("Loaded configuration");
+
+            if (configuration.botToken.isEmpty()) {
+                LOGGER.error("No bot token configured!");
+                System.exit(-1);
+            }
 
             discordBot = JDABuilder.createLight(config.get().botToken)
                     .setActivity(Activity.listening("your commands"))
