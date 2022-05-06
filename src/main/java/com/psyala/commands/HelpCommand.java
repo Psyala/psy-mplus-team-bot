@@ -7,6 +7,7 @@ import com.psyala.listeners.MessageListener;
 import com.psyala.pojo.Dungeon;
 import com.psyala.pojo.characterists.ArmourClass;
 import com.psyala.pojo.characterists.CharacterClass;
+import com.psyala.pojo.characterists.Role;
 import com.psyala.pojo.characterists.TrinketClass;
 import com.psyala.util.MessageFormatting;
 import net.dv8tion.jda.api.entities.Guild;
@@ -38,7 +39,7 @@ public class HelpCommand extends SimpleCommand {
         String commands = "**Commands**" +
                 "\r\n```" +
                 commandList.stream().map(command ->
-                                "• " + command.getCommand() + ": " + command.getDescription())
+                        "• " + command.getCommand() + ": " + command.getDescription())
                         .collect(Collectors.joining("\r\n\r\n")) +
                 "```";
 
@@ -49,6 +50,9 @@ public class HelpCommand extends SimpleCommand {
                 "\r\n```\r\n```" +
                 "**Classes**\r\n• " +
                 Arrays.stream(CharacterClass.values()).map(Enum::name).collect(Collectors.joining("\r\n• ")) +
+                "\r\n```\r\n```" +
+                "**Roles**\r\n• " +
+                Arrays.stream(Role.values()).map(Enum::name).collect(Collectors.joining("\r\n• ")) +
                 "\r\n```\r\n```" +
                 "**Armour Class**\r\n• " +
                 Arrays.stream(ArmourClass.values()).map(Enum::name).collect(Collectors.joining("\r\n• ")) +
@@ -65,11 +69,11 @@ public class HelpCommand extends SimpleCommand {
                 .queue(success -> {
                 }, failure -> {
                     channel.sendMessageEmbeds(
-                                    MessageFormatting.createTextualEmbedMessage(
-                                            ":robot: Bot Help :robot:",
-                                            "Could not whisper you ".concat(author.getAsMention()) + " check your privacy settings!"
-                                    )
+                            MessageFormatting.createTextualEmbedMessage(
+                                    ":robot: Bot Help :robot:",
+                                    "Could not whisper you ".concat(author.getAsMention()) + " check your privacy settings!"
                             )
+                    )
                             .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                             .flatMap(Message::delete)
                             .queue();

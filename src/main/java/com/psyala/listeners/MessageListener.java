@@ -34,6 +34,7 @@ public class MessageListener extends ListenerAdapter {
         commandList.add(new CharacterDelist());
         commandList.add(new KeystoneRegister());
         commandList.add(new KeyQuery());
+        commandList.add(new RoleUpdate());
     }
 
     @Override

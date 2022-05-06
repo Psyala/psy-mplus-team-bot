@@ -3,20 +3,23 @@ package com.psyala.commands;
 import com.psyala.Beltip;
 import com.psyala.commands.base.ParameterCommand;
 import com.psyala.pojo.Character;
-import com.psyala.pojo.*;
+import com.psyala.pojo.Player;
+import com.psyala.pojo.Server;
+import com.psyala.pojo.characterists.Role;
 import com.psyala.util.MessageFormatting;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-public class KeystoneRegister extends ParameterCommand {
-    public KeystoneRegister() {
-        super("keystone", "Register a keystone to the character\r\n\r\n\tUsage: keystone <CharacterName> <DungeonAcronym> <Level>");
+public class RoleUpdate extends ParameterCommand {
+    public RoleUpdate() {
+        super("role_update", "Updates a characters preferred role(s)\r\n\r\n\tUsage: role_update <CharacterName> <Role...>");
     }
 
     @Override
@@ -25,42 +28,52 @@ public class KeystoneRegister extends ParameterCommand {
 
         if (parameters.isEmpty()) {
             responseMessage = "No parameters provided";
+        } else if (parameters.size() == 1) {
+            responseMessage = "Incorrect number of parameters provided";
         } else {
             try {
-                String characterName = parameters.get(0);
-                String dungeonAcronym = parameters.get(1);
-                int dungeonLevel = Integer.parseInt(parameters.get(2));
-
                 Server server = Beltip.guildController.getGuildStorageObject(guild);
+                String characterName = parameters.get(0);
 
                 Optional<Player> playerO = server.playerList.stream()
                         .filter(player -> player.containsCharacter(characterName))
                         .findFirst();
                 if (playerO.isPresent()) {
                     Character character = playerO.get().getCharacter(characterName);
-                    Dungeon dungeon = Dungeon.fromAcronym(dungeonAcronym);
 
-                    Keystone keystone = new Keystone();
-                    keystone.dungeon = dungeon;
-                    keystone.level = dungeonLevel;
-                    character.currentKeystone = keystone;
+                    List<String> remainingParams = new ArrayList<>(parameters);
+                    remainingParams.remove(0);
 
-                    Beltip.guildController.updateGuildStorageObject(guild, server);
+                    List<Role> foundRoles = new ArrayList<>();
+                    for (String remainingParam : remainingParams) {
+                        Optional<Role> role = Role.get(remainingParam.toUpperCase());
+                        role.ifPresent(foundRoles::add);
+                    }
+
+                    boolean allRolesOk = foundRoles.stream()
+                            .allMatch(role -> character.characterClass.getPossibleRoles().contains(role));
+
+                    if (allRolesOk) {
+                        character.playableRoles.clear();
+                        character.playableRoles.addAll(foundRoles);
+                        Beltip.guildController.updateGuildStorageObject(guild, server);
+                    } else {
+                        responseMessage = "Invalid role provided for character class: " + character.characterClass.name();
+                    }
                 } else {
                     responseMessage = "Could not find character: " + characterName;
                 }
+
             } catch (IndexOutOfBoundsException ex) {
                 responseMessage = "Not all parameters are present";
-            } catch (NumberFormatException ex) {
-                responseMessage = "Failed to parse provided dungeon level";
             } catch (IllegalArgumentException ex) {
-                responseMessage = "Could not parse provided dungeon value";
+                responseMessage = "Could not parse provided role value";
             }
         }
 
         if (!responseMessage.isEmpty())
             channel.sendMessageEmbeds(
-                    MessageFormatting.createTextualEmbedMessage("Keystone Register Response", responseMessage)
+                    MessageFormatting.createTextualEmbedMessage("Role Update Response", responseMessage)
             )
                     .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
                     .flatMap(Message::delete)
