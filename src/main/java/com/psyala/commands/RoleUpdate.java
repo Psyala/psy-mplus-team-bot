@@ -54,7 +54,7 @@ public class RoleUpdate extends ParameterCommand {
                             .allMatch(role -> character.characterClass.getPossibleRoles().contains(role));
 
                     if (allRolesOk) {
-                        character.playableRoles.clear();
+                        character.playableRoles = new ArrayList<>();
                         character.playableRoles.addAll(foundRoles);
                         Beltip.guildController.updateGuildStorageObject(guild, server);
                     } else {
