@@ -71,7 +71,7 @@ public class MessageListener extends ListenerAdapter {
                         messageDeleted.set(true);
                         commandActioned.set(true);
                         if (!batch) DiscordInteractions.deleteMessage(message);
-                        LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, command));
+                        LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, splitMessage));
                     }
                     if (splitMessage.startsWith(COMMAND_CHAR + command.getCommand()) && command instanceof ParameterCommand) {
                         List<String> parameters = Arrays.asList(splitMessage.replace("!" + command.getCommand(), "").split(" "));
@@ -79,7 +79,7 @@ public class MessageListener extends ListenerAdapter {
                         messageDeleted.set(true);
                         commandActioned.set(true);
                         if (!batch) DiscordInteractions.deleteMessage(message);
-                        LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, command));
+                        LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, splitMessage));
                     }
                 });
 
