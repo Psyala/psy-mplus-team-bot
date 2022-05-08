@@ -70,7 +70,7 @@ public class GuildController {
                     LOGGER.error("Error", ex);
                 }
             }
-        }, 2000, 2000);
+        }, 0, 15000);
     }
 
     public void purge() {
