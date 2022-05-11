@@ -50,11 +50,14 @@ public class CharacterDelist extends ParameterCommand {
         }
 
         if (!responseMessage.isEmpty())
-            channel.sendMessageEmbeds(
+            Beltip.messageController.addMessageToQueue(guild,
+                    channel.sendMessageEmbeds(
                             MessageFormatting.createTextualEmbedMessage("Delist Character Response", responseMessage)
                     )
-                    .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
-                    .flatMap(Message::delete)
-                    .queue();
+                            .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
+                            .flatMap(Message::delete)
+
+            );
+
     }
 }

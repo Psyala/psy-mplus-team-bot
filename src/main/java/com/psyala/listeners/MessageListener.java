@@ -61,35 +61,28 @@ public class MessageListener extends ListenerAdapter {
 
             //Handle command
             List<String> messages = Arrays.asList(msg.split("\n"));
-            boolean batch = messages.size() > 1;
             AtomicBoolean commandActioned = new AtomicBoolean(false);
             messages.forEach(splitMessage -> {
-                AtomicBoolean messageDeleted = new AtomicBoolean(false);
                 commandList.forEach(command -> {
                     if (splitMessage.equals(COMMAND_CHAR + command.getCommand()) && command instanceof SimpleCommand) {
                         ((SimpleCommand) command).handle(guild, author, channel);
-                        messageDeleted.set(true);
                         commandActioned.set(true);
-                        if (!batch) DiscordInteractions.deleteMessage(message);
                         LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, splitMessage));
                     }
                     if (splitMessage.startsWith(COMMAND_CHAR + command.getCommand()) && command instanceof ParameterCommand) {
                         List<String> parameters = Arrays.asList(splitMessage.replace("!" + command.getCommand(), "").split(" "));
                         ((ParameterCommand) command).handle(guild, author, channel, parameters.stream().filter(s -> !s.isEmpty()).collect(Collectors.toList()));
-                        messageDeleted.set(true);
                         commandActioned.set(true);
-                        if (!batch) DiscordInteractions.deleteMessage(message);
                         LOGGER.info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, splitMessage));
                     }
                 });
 
                 //Delete incoming message if in moderated channel
                 if (Arrays.asList(Beltip.configuration.channelOverviewName)
-                        .contains(textChannel.getName()) && !messageDeleted.get()) {
+                        .contains(textChannel.getName())) {
                     DiscordInteractions.deleteMessage(message);
                 }
             });
-            if (batch && commandActioned.get()) DiscordInteractions.deleteMessage(message);
         }
     }
 }

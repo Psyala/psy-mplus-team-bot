@@ -59,11 +59,12 @@ public class KeystoneRegister extends ParameterCommand {
         }
 
         if (!responseMessage.isEmpty())
-            channel.sendMessageEmbeds(
-                    MessageFormatting.createTextualEmbedMessage("Keystone Register Response", responseMessage)
-            )
-                    .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
-                    .flatMap(Message::delete)
-                    .queue();
+            Beltip.messageController.addMessageToQueue(guild,
+                    channel.sendMessageEmbeds(
+                            MessageFormatting.createTextualEmbedMessage("Keystone Register Response", responseMessage)
+                    )
+                            .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
+                            .flatMap(Message::delete)
+            );
     }
 }

@@ -18,18 +18,20 @@ public class InitialiseGuild extends SimpleCommand {
     @Override
     public void handle(Guild guild, User author, MessageChannel channel) {
         if (Beltip.guildController.getValidGuilds().contains(guild)) {
-            channel.sendMessageEmbeds(
-                    MessageFormatting.createTextualEmbedMessage("Initialisation Result", "Server already initialised")
-            )
-                    .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
-                    .flatMap(Message::delete)
-                    .queue();
+            Beltip.messageController.addMessageToQueue(guild,
+                    channel.sendMessageEmbeds(
+                            MessageFormatting.createTextualEmbedMessage("Initialisation Result", "Server already initialised")
+                    )
+                            .delay(Beltip.MESSAGE_DELETE_TIME, TimeUnit.SECONDS)
+                            .flatMap(Message::delete)
+            );
         } else {
             boolean initialised = Beltip.guildController.initialiseGuild(guild);
             if (initialised) {
-                channel.sendMessageEmbeds(
-                        MessageFormatting.createTextualEmbedMessage("Initialisation Result", "Server now initialised")
-                ).queue();
+                Beltip.messageController.addMessageToQueue(guild,
+                        channel.sendMessageEmbeds(
+                                MessageFormatting.createTextualEmbedMessage("Initialisation Result", "Server now initialised")
+                        ));
             }
         }
     }

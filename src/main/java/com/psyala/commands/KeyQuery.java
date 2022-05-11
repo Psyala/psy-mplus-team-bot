@@ -114,8 +114,9 @@ public class KeyQuery extends ParameterCommand {
                 )
                 .setColor(MessageFormatting.EMBED_COLOUR)
                 .build();
-        channel.sendMessageEmbeds(messageEmbed)
-                .queue();
+        Beltip.messageController.addMessageToQueue(guild,
+                channel.sendMessageEmbeds(messageEmbed)
+        );
     }
 
     private String outputCharacter(Character character, Role role, boolean keystoneHolder) {

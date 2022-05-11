@@ -1,6 +1,7 @@
 package com.psyala;
 
 import com.psyala.controller.GuildController;
+import com.psyala.controller.MessageController;
 import com.psyala.listeners.MessageListener;
 import com.psyala.pojo.Configuration;
 import com.psyala.pojo.Server;
@@ -26,6 +27,7 @@ public class Beltip {
     public static int MESSAGE_IMPORTANT_DELETE_TIME = 30;
     public static Configuration configuration;
     public static GuildController guildController;
+    public static MessageController messageController;
     public static String version;
 
     public static void main(String[] args) {
@@ -68,6 +70,8 @@ public class Beltip {
             }));
 
             guildController = new GuildController(discordBot.getGuilds(), configLoader);
+
+            messageController = new MessageController();
 
             resetTimer.scheduleAtFixedRate(new TimerTask() {
                 @Override

@@ -64,8 +64,9 @@ public class GuildController {
             public void run() {
                 try {
                     overviewMessageEditBuffer.forEach((overviewChannel, messageAction) -> {
-                        messageAction.queue();
+                        Beltip.messageController.addMessageToQueue(overviewChannel.getGuild(), messageAction);
                     });
+                    overviewMessageEditBuffer.clear();
                 } catch (Exception ex) {
                     LOGGER.error("Error", ex);
                 }
