@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.internal.entities.TextChannelImpl;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DiscordInteractions {
@@ -21,6 +22,7 @@ public class DiscordInteractions {
 
     public static void deleteMessage(Message message) {
         message.delete()
+                .delay(2, TimeUnit.SECONDS)
                 .queue(
                         unused -> {
                         },
